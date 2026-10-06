@@ -1,0 +1,494 @@
+---
+title: "Logistische Regression"
+subtitle: "Wenn die abhängige Variable nur 0 oder 1 kennt"
+author: "Gidon T. Frischkorn"
+date: "2026-10-29"
+date-format: "D. MMMM YYYY"
+lang: de
+format:
+  revealjs:
+    theme: [default, custom.scss]
+    width: 1280
+    height: 720
+    slide-number: c/t
+    transition: fade
+    transition-speed: fast
+    footer: "Lehrprobe · Logistische Regression · BSc Statistik"
+    html-math-method: mathjax
+    fig-align: center
+    navigation-mode: linear
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r setup}
+#| include: false
+# Alle Zahlen und Abbildungen werden beim Rendern neu erzeugt.
+source("R/01_simulate_data.R", local = new.env())
+source("R/02_compute_numbers.R", local = new.env())
+source("R/03_figures.R", local = new.env())
+
+get_val <- function(file, key) {
+  d <- read.csv(file.path("output", file))
+  d[[2]][d[[1]] == key]
+}
+params   <- read.csv("output/sim_params.csv")
+beta0    <- get_val("sim_params.csv", "beta0")
+beta1    <- get_val("sim_params.csv", "beta1")
+n_total  <- get_val("lm_numbers.csv", "n_total")
+pred_lo  <- get_val("lm_numbers.csv", "lm_pred_min_x")
+pred_hi  <- get_val("lm_numbers.csv", "lm_pred_max_x")
+x_lo     <- get_val("lm_numbers.csv", "x_min_obs")
+x_hi     <- get_val("lm_numbers.csv", "x_max_obs")
+n_out    <- get_val("lm_numbers.csv", "n_fitted_outside_01")
+x_mid    <- get_val("true_curve.csv", "x_at_pi_50")
+x_mid2   <- get_val("true_curve.csv", "x_at_pi_50_beta1_doubled")
+tt       <- read.csv("output/transform_table.csv")
+odds_80  <- tt$odds[tt$pi == 0.8]
+
+f2 <- function(x) formatC(x, format = "f", digits = 2)
+pct <- function(x) paste0(formatC(100 * x, format = "f", digits = 0), " %")
+materials_url <- "https://gidonfrischkorn.github.io/lehrprobe-logistische-regression/"
+```
+
+## Wo stehen wir?
+
+::: {.timeline}
+::: {}
+[Bisher]{.label}
+Lineare Regression als statistisches Modell: Normalverteilung, deren Mittelwert von $x$ abhängt
+:::
+::: {.now .fragment fragment-index=2}
+[Jetzt]{.label}
+Was ändert sich, wenn die abhängige Variable nur 0 oder 1 sein kann?
+:::
+::: {.fragment fragment-index=1}
+[Danach]{.label}
+Koeffizienten als Odds Ratios interpretieren, Schätzung, `glm(family = binomial)` in R
+:::
+:::
+
+<br>
+
+::: {.fragment fragment-index=3}
+**Laufendes Beispiel** (simulierte Daten): `r n_total` Patient:innen nach einer Psychotherapie.
+Remission ja (1) oder nein (0), je nach Anzahl Therapiesitzungen (`r x_lo` bis `r x_hi`).
+:::
+
+::: {.notes}
+EINORDNUNG (0:00–0:30), 3 Klicks. Wörtlich etwa:
+«In der letzten Sitzung haben wir die lineare Regression als statistisches Modell
+kennengelernt: eine Normalverteilung, deren Mittelwert von x abhängt.»
+[Klick] Danach. «Nach diesem Abschnitt schauen wir uns an, wie man die Koeffizienten
+als Odds Ratios interpretiert und das Modell in R schätzt.»
+[Klick] Jetzt. «Und dazwischen: heute.» Frage vorlesen.
+[Klick] Beispiel einführen: Klinische Frage, die sie kennen: Hängt es mit der Anzahl
+Sitzungen zusammen, ob jemand remittiert? Remission ist ja/nein.
+:::
+
+## Ihre Intuition ist gefragt
+
+:::: {.columns}
+::: {.column width="62%"}
+![](figures/fig1_daten.png){fig-alt="Streudiagramm: Remission (0 = nein, 1 = ja) gegen Anzahl Therapiesitzungen von 1 bis 40. Bei wenigen Sitzungen liegen fast alle Punkte bei 0, bei vielen Sitzungen fast alle bei 1."}
+:::
+::: {.column width="38%"}
+::: {.klicker}
+**KlickerUZH:** Was passiert, wenn wir hier eine lineare Regression rechnen?
+
+A. Die Gerade beschreibt die Daten gut.
+
+B. Für manche Personen sagt die Gerade Werte unter 0 oder über 1 vorher.
+
+C. R bricht mit einer Fehlermeldung ab, weil $Y$ nur 0 und 1 enthält.
+:::
+
+[KlickerUZH-Link / QR hier einfügen]{.small-note}
+:::
+::::
+
+::: {.notes}
+KLICKER (0:30–2:00), keine Klicks: alle Optionen stehen von Anfang an. Frage in KlickerUZH vorbereitet (Single Choice A/B/C).
+Ansage: «Schätzen Sie, ohne zu rechnen. 45 Sekunden.»
+Abstimmung offen ~45 s, Ergebnis zeigen, NICHT auflösen: «Interessant, Sie sind sich
+nicht einig. Schauen wir nach.»
+Fallback ohne Netz: Handzeichen A/B/C.
+Erwartung: viele A oder C. C ist falsch: R rechnet lm() mit 0/1 klaglos.
+:::
+
+## Was passiert mit der Geraden? {.nostretch}
+
+::: {.r-stack .layers}
+![](figures/fig2_0_punkte.png){fig-alt="Streudiagramm: Remission (0 = nein, 1 = ja) gegen Anzahl Therapiesitzungen von 1 bis 40, dieselben Daten wie auf der Klicker-Folie."}
+
+![](figures/fig2_1_gerade.png){.fragment fragment-index=1 fig-alt="Dieselben Daten mit der Regressionsgeraden der linearen Regression. Die Gerade steigt von links unten nach rechts oben."}
+
+![](figures/fig2_2_bereiche.png){.fragment fragment-index=2 fig-alt="Dieselben Daten mit der Regressionsgeraden. Die Bereiche unter 0 und über 1 sind orange schattiert; die Gerade liegt links unter 0 und rechts über 1."}
+
+![](figures/fig2_3_vorhersagen.png){.fragment fragment-index=3 fig-alt="Wie zuvor, zusätzlich sind die Vorhersagen der Geraden bei 1 und bei 40 Sitzungen als Kreise markiert und beschriftet: `r f2(pred_lo)` und `r f2(pred_hi)`."}
+:::
+
+::: {.fragment fragment-index=3}
+Vorhersage bei `r x_hi` Sitzungen: **`r f2(pred_hi)`**, also eine «Wahrscheinlichkeit» von `r pct(pred_hi)`? Bei `r x_lo` Sitzung: **`r f2(pred_lo)`**.
+`r n_out` von `r n_total` vorhergesagten Werten liegen ausserhalb von [0, 1].
+:::
+
+::: {.notes}
+AUFLÖSUNG (2:00–3:00), 3 Klicks. Start: nur die Punkte. «Schauen wir nach.»
+[Klick] Gerade. Antwort B. «R rechnet das klaglos, keine Fehlermeldung» (gegen C).
+[Klick] Schattierte Bereiche: «Wahrscheinlichkeiten gibt es nur zwischen 0 und 1.»
+[Klick] Markierungen bei 1 und `r x_hi` Sitzungen + Textzeile: «Bei `r x_hi` Sitzungen
+sagt die Gerade `r f2(pred_hi)` vorher, eine Wahrscheinlichkeit von `r pct(pred_hi)`.»
+Kernsatz: «Die Gerade weiss nicht, dass es eine Wahrscheinlichkeit beschreiben soll.»
+Überleitung: «Das Problem liegt nicht in der Geraden, sondern im Modell dahinter.
+Dafür gehen wir einen Schritt zurück.»
+:::
+
+## Jeder Test beruht auf einem Modell {.nostretch}
+
+::::: {.columns}
+:::: {.column width="50%"}
+[Lineare Regression]{.lm}
+
+$$Y_i \sim \mathcal{N}(\mu_i,\ \sigma^2), \quad \mu_i = \beta_0 + \beta_1 x_i$$
+
+![](figures/fig3a_normal.png){fig-alt="Regressionsgerade für einen Symptomwert mit Normalverteilungen um den Mittelwert bei 5, 20 und 35 Sitzungen." width="74%"}
+::::
+:::: {.column width="50%"}
+::: {.fragment fragment-index=1}
+[Binäre AV: Remission]{.logit}
+
+$$Y_i \sim \mathcal{B}(1,\ \pi_i), \quad \pi_i = \ ?$$
+:::
+
+::: {.r-stack}
+![](figures/fig3b_1_balken.png){.fragment fragment-index=2 fig-alt="Balken für die Wahrscheinlichkeit von 0 und 1 bei 5, 20 und 35 Sitzungen; mit mehr Sitzungen wächst der Balken bei 1." width="74%"}
+
+![](figures/fig3b_binomial.png){.fragment fragment-index=3 fig-alt="Dieselben Balken; zusätzlich markiert bei 5, 20 und 35 Sitzungen je ein Kreis pi, die Wahrscheinlichkeit für 1. Mit mehr Sitzungen liegt der Kreis höher." width="74%"}
+:::
+::::
+:::::
+
+::: {.fragment .merke fragment-index=4}
+Gleiche Struktur: eine **Verteilung** und ein **Parameter, der von $x$ abhängt**.
+:::
+
+::: {.notes}
+IDEE 1 (3:00–5:00), 4 Klicks. Start: nur links.
+Links: Was sie kennen. Jede Person hat ihre eigene Normalverteilung; der Mittelwert
+mu_i liegt auf der Geraden.
+[Klick] Rechts Formel: Binäre AV braucht eine andere Verteilung. «Erinnern Sie sich an die
+Binomialverteilung aus Statistik I: X ~ B(n, pi), Anzahl richtige Antworten, wenn man
+bei 20 Single-Choice-Fragen rät. Hier ziehen wir pro Person genau einmal: n = 1.»
+(B(1, pi) heisst auch Bernoulli-Verteilung.)
+[Klick] Balken: bei 5 Sitzungen meist 0, bei 35 meist 1.
+[Klick] Kreise: Die Kreise sind pi_i, der Mittelwert der 0/1-Variable.
+Frage an den Raum: «Was liegt nahe für pi_i?» → «Die Gerade wie links!»
+[Klick] Merke-Box: gleiche Struktur.
+Genau das hat die lineare Regression gemacht, und das ging schief. Warum?
+:::
+
+## Das Problem: der Wertebereich
+
+$\pi_i$ liegt zwischen 0 und 1, aber $\beta_0 + \beta_1 x_i$ kann jeden Wert annehmen.
+
+```{=html}
+<table class="leiter">
+  <tr class="fragment"><td><b>Wahrscheinlichkeit</b></td><td>\(\pi\)</td><td class="range">0 bis 1</td><td><img class="zahlenstrahl" src="figures/zahlenstrahl_1_pi.png" alt="Zahlenstrahl: nur das kurze Stück von 0 bis 1 ist markiert."></td></tr>
+  <tr class="fragment"><td><b>Odds</b></td><td>\(\dfrac{\pi}{1-\pi}\)</td><td class="range">0 bis ∞</td><td><img class="zahlenstrahl" src="figures/zahlenstrahl_2_odds.png" alt="Zahlenstrahl: markiert ist alles ab 0, mit Pfeil nach rechts ins Unendliche."></td></tr>
+  <tr class="fragment"><td><b>Log-Odds</b></td><td>\(\ln\!\left(\dfrac{\pi}{1-\pi}\right)\)</td><td class="range">−∞ bis ∞</td><td><img class="zahlenstrahl" src="figures/zahlenstrahl_3_logodds.png" alt="Zahlenstrahl: der ganze Zahlenstrahl ist markiert, mit Pfeilen nach links und rechts."></td></tr>
+</table>
+```
+
+::: {.fragment .denkpause}
+**Denkpause:** Wenn $\pi = .8$, wie gross sind die Odds?
+:::
+
+::: {.fragment}
+$.8 / .2 = `r odds_80`$: viermal so wahrscheinlich wie nicht. Kennen Sie aus dem Bayes-Beispiel (Prior-Odds).
+:::
+
+::: {.notes}
+IDEE 2 (5:00–7:00), 5 Klicks (wie bisher; die Zahlenstrahlen kommen mit ihrer Zeile).
+[Klick] Wahrscheinlichkeit, [Klick] Odds, [Klick] Log-Odds; jeweils «Was ist der
+kleinste, was der grösste Wert?» Auf den Zahlenstrahl zeigen: der Bereich wächst.
+[Klick] DENKPAUSE, 20 Sekunden, Antwort aus dem Raum holen (4). [Klick] Auflösung.
+Anknüpfen an Statistik I: odds_prior <- 0.8/0.2, und zurück mit odds/(1 + odds).
+Log-Odds: ln von Werten zwischen 0 und 1 ist negativ, ln(1) = 0, ln von Werten > 1
+positiv. Damit ist der ganze Zahlenstrahl abgedeckt.
+:::
+
+## Drei Skalen, dieselbe Information
+
+```{r transform-table}
+#| results: asis
+fmt_tab <- function(x) sub("-", "\u2212", formatC(x, format = "f", digits = 2))
+# Klick 1 hebt die symmetrischen Zeilen .20 und .80 hervor (±1.39)
+hl <- round(tt$pi, 2) %in% c(0.20, 0.80)
+rows <- sprintf('<tr%s><td>%s</td><td>%s</td><td>%s</td></tr>',
+                ifelse(hl, ' class="fragment custom hl-row" data-fragment-index="1"', ""),
+                fmt_tab(tt$pi), fmt_tab(tt$odds), fmt_tab(tt$log_odds))
+cat('<table class="transform"><thead><tr>',
+    '<th>Wahrscheinlichkeit π</th><th>Odds π/(1−π)</th>',
+    '<th>Log-Odds ln(π/(1−π))</th></tr></thead><tbody>',
+    rows, '</tbody></table>', sep = "\n")
+```
+
+::: {.fragment .merke fragment-index=2}
+$\pi = .5$ wird zu Log-Odds 0. Gleich wahrscheinlich und gleich unwahrscheinlich liegen symmetrisch um 0.
+:::
+
+::: {.notes}
+(7:00–7:30), 2 Klicks. Nur kurz zeigen, nicht vorlesen.
+[Klick] Zeilen .20 und .80 hervorgehoben: ±1.39. [Klick] Merke-Box.
+Optional kürzen: Diese Folie kann übersprungen werden (Kürzungspunkt B; mit G 8 Enter
+direkt zur nächsten Folie, sonst dreimal weiterklicken).
+:::
+
+## Das logistische Regressionsmodell
+
+:::: {.columns}
+::: {.column .modell-links width="48%"}
+$$Y_i \sim \mathcal{B}(1,\ \pi_i)$$
+
+::: {.r-stack}
+::: {.fragment .fade-out fragment-index=1}
+$$\pi_i = \ ?$$
+:::
+::: {.fragment fragment-index=1}
+$$\ln\!\left(\frac{\pi_i}{1-\pi_i}\right) = \beta_0 + \beta_1 x_i$$
+:::
+:::
+
+::: {.fragment fragment-index=2}
+Zurück zur Wahrscheinlichkeit, wie im Bayes-Beispiel:
+
+::: {.fragment .highlight-current-blue fragment-index=2}
+$$\text{Odds}_i = e^{\text{Log-Odds}_i} = e^{\beta_0 + \beta_1 x_i}$$
+:::
+:::
+
+::: {.fragment fragment-index=3}
+::: {.fragment .highlight-current-blue fragment-index=3}
+$$
+\pi_i = \frac{\text{Odds}_i}{1 + \text{Odds}_i}
+= \frac{e^{\beta_0 + \beta_1 x_i}}{1 + e^{\beta_0 + \beta_1 x_i}}
+$$
+:::
+:::
+:::
+::: {.column width="52%"}
+::: {.fragment fragment-index=4}
+![](figures/fig4_s_kurve.png){fig-alt="Dieselben Daten mit einer S-förmigen Kurve, die von nahe 0 bei wenigen Sitzungen auf nahe 1 bei vielen Sitzungen ansteigt und den Bereich 0 bis 1 nie verlässt."}
+
+[Kurve: $\beta_0 = `r beta0`$, $\beta_1 = `r beta1`$]{.small-note}
+:::
+:::
+::::
+
+::: {.notes}
+(7:30–8:30), 4 Klicks. Start: «pi_i = ?» wie auf Folie 5.
+[Klick] Logit-Gleichung ersetzt das Fragezeichen. Der lineare Teil bleibt: links steht
+jetzt logit(pi_i) statt mu_i.
+[Klick] Zurückrechnen, erster Schritt (blau): e hoch Log-Odds gibt die Odds.
+[Klick] Zweiter Schritt (blau): Odds/(1 + Odds) gibt die Wahrscheinlichkeit.
+Dieselbe Formel wie im Bayes-Beispiel.
+[Klick] Ergebnis: Die S-Kurve. Sie bleibt zwischen 0 und 1, egal wie viele Sitzungen.
+:::
+
+## Was passiert, wenn sich $\beta_1$ verdoppelt? {.nostretch}
+
+```{r slider-data}
+#| results: asis
+d <- read.csv("data/remission.csv")
+cat("<script>window.remissionData = ",
+    jsonlite::toJSON(d[, c("sitzungen", "remission")]),
+    "; window.logitStart = ",
+    jsonlite::toJSON(list(b0 = beta0, b1 = beta1), auto_unbox = TRUE),
+    ";</script>", sep = "")
+```
+
+```{=html}
+<div class="logit-widget">
+  <div class="slider-controls">
+    <label>β₀ = <b id="b0-val"></b>
+      <input type="range" id="b0" min="-8" max="4" step="0.1"></label>
+    <label>β₁ = <b id="b1-val"></b>
+      <input type="range" id="b1" min="-0.3" max="0.6" step="0.01"></label>
+    <label><input type="checkbox" id="show-ref" checked> Ausgangskurve</label>
+    <button id="animate" type="button">Animieren</button>
+    <button id="reset" type="button">Zurücksetzen</button>
+  </div>
+  <svg id="logit-svg" viewBox="0 0 900 400" role="img"
+       aria-label="Interaktive S-Kurve der logistischen Regression"></svg>
+</div>
+<script>
+(function () {
+  const data = window.remissionData, start = window.logitStart;
+  const svg = document.getElementById("logit-svg");
+  const W = 900, H = 400, m = {l: 90, r: 20, t: 15, b: 55};
+  const xMin = 0, xMax = 41, yMin = -0.15, yMax = 1.2;
+  const sx = x => m.l + (x - xMin) / (xMax - xMin) * (W - m.l - m.r);
+  const sy = y => H - m.b - (y - yMin) / (yMax - yMin) * (H - m.t - m.b);
+  const ns = "http://www.w3.org/2000/svg";
+  const el = (tag, attrs, parent) => {
+    const e = document.createElementNS(ns, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    (parent || svg).appendChild(e);
+    return e;
+  };
+  // Achsen und Gitter
+  [0, 0.5, 1].forEach(v => {
+    el("line", {x1: sx(xMin), x2: sx(xMax), y1: sy(v), y2: sy(v),
+                stroke: "#e3e3e3", "stroke-width": 1.5});
+    const t = el("text", {x: m.l - 10, y: sy(v) + 6, "text-anchor": "end",
+                          "font-size": 20, fill: "#555"});
+    t.textContent = v === 0 ? "0 = nein" : v === 1 ? "1 = ja" : "0.5";
+  });
+  [0, 10, 20, 30, 40].forEach(v => {
+    el("line", {x1: sx(v), x2: sx(v), y1: sy(yMin), y2: sy(yMax),
+                stroke: "#f0f0f0", "stroke-width": 1.5});
+    const t = el("text", {x: sx(v), y: H - m.b + 26, "text-anchor": "middle",
+                          "font-size": 20, fill: "#555"});
+    t.textContent = v;
+  });
+  const xl = el("text", {x: (m.l + W - m.r) / 2, y: H - 6,
+                         "text-anchor": "middle", "font-size": 22});
+  xl.textContent = "Anzahl Therapiesitzungen";
+  // Datenpunkte (deterministisches Jittern)
+  data.forEach((d, i) => {
+    const jit = ((i * 37) % 13 - 6) / 6 * 0.03;
+    el("circle", {cx: sx(d.sitzungen), cy: sy(d.remission + jit), r: 4.5,
+                  fill: "#595959", "fill-opacity": 0.45});
+  });
+  const refPath = el("path", {fill: "none", stroke: "#0072B2",
+    "stroke-width": 3, "stroke-dasharray": "8 6", "stroke-opacity": 0.5});
+  const curPath = el("path", {fill: "none", stroke: "#009E73",
+                              "stroke-width": 4.5});
+  const midLine = el("line", {stroke: "#009E73", "stroke-width": 2,
+                              "stroke-dasharray": "4 4"});
+  const midText = el("text", {"font-size": 20, fill: "#009E73",
+                              "text-anchor": "start"});
+  const pathFor = (b0, b1) => {
+    let p = "";
+    for (let k = 0; k <= 200; k++) {
+      const x = xMin + k / 200 * (xMax - xMin);
+      const y = 1 / (1 + Math.exp(-(b0 + b1 * x)));
+      p += (k ? "L" : "M") + sx(x).toFixed(1) + "," + sy(y).toFixed(1);
+    }
+    return p;
+  };
+  refPath.setAttribute("d", pathFor(start.b0, start.b1));
+  const b0In = document.getElementById("b0"), b1In = document.getElementById("b1");
+  const showRef = document.getElementById("show-ref");
+  const fmt = (v, d) => Number(v).toFixed(d).replace("-", "−");
+  function update() {
+    const b0 = +b0In.value, b1 = +b1In.value;
+    document.getElementById("b0-val").textContent = fmt(b0, 1);
+    document.getElementById("b1-val").textContent = fmt(b1, 2);
+    curPath.setAttribute("d", pathFor(b0, b1));
+    refPath.style.display = showRef.checked ? "" : "none";
+    const xm = b1 !== 0 ? -b0 / b1 : NaN;
+    if (isFinite(xm) && xm >= xMin && xm <= xMax) {
+      midLine.setAttribute("x1", sx(xm)); midLine.setAttribute("x2", sx(xm));
+      midLine.setAttribute("y1", sy(0.5)); midLine.setAttribute("y2", sy(yMin));
+      midText.setAttribute("x", sx(xm) + 8); midText.setAttribute("y", sy(0.5) - 10);
+      midText.textContent = "π = .5 bei x = " + fmt(xm, 1);
+      midLine.style.display = midText.style.display = "";
+    } else {
+      midLine.style.display = midText.style.display = "none";
+    }
+  }
+  // Animieren: beta1 in 1.5 s von der Ausgangskurve auf das Doppelte
+  let tween = null;
+  function stopTween() { if (tween !== null) cancelAnimationFrame(tween); tween = null; }
+  function animate() {
+    stopTween();
+    const from = start.b1, to = 2 * start.b1, dur = 1500;
+    b0In.value = start.b0; b1In.value = from; update();
+    const t0 = performance.now();
+    const step = now => {
+      const u = Math.min(1, (now - t0) / dur);
+      const e = u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
+      b1In.value = from + (to - from) * e;
+      update();
+      tween = u < 1 ? requestAnimationFrame(step) : null;
+    };
+    tween = requestAnimationFrame(step);
+  }
+  function reset() { stopTween(); b0In.value = start.b0; b1In.value = start.b1; update(); }
+  [b0In, b1In, showRef].forEach(e => e.addEventListener("input", update));
+  [b0In, b1In].forEach(e => e.addEventListener("input", stopTween));
+  document.getElementById("reset").addEventListener("click", reset);
+  // Nach dem Klick den Fokus abgeben, damit Leertaste/Pfeile wieder die Folien steuern
+  document.getElementById("animate").addEventListener("click", ev => {
+    animate(); ev.currentTarget.blur();
+  });
+  // Pfeiltasten im Slider nicht an reveal.js weitergeben
+  [b0In, b1In].forEach(e => e.addEventListener("keydown", ev => ev.stopPropagation()));
+  reset();
+})();
+</script>
+```
+
+::: {.notes}
+DENKPAUSE + SLIDER (8:30–9:30).
+Erst fragen, dann schieben: «β1 von 0.15 auf 0.30. Wird die Kurve steiler, flacher,
+oder verschiebt sie sich? Kurz mit Ihrem Nebenan besprechen.» (15 s)
+Dann «Animieren» klicken (Maus, kein Folienklick): β1 läuft in 1.5 s von 0.15 auf
+0.30. Alternativ von Hand schieben. Auflösung: steiler UND der Punkt mit π = .5 wandert von
+x = `r x_mid` nach x = `r x_mid2` (weil π = .5 bei x = −β0/β1).
+Negatives β1 kurz zeigen: Kurve fällt.
+Fallback (kein Browser/JS): Backup-Folie am Ende (fig5).
+Kürzungspunkt A: Bei Zeitnot nur die Frage stellen, «Animieren», kein negatives β1.
+:::
+
+## Mitnehmen
+
+::: {.merke}
+1. Jedes statistische Modell ist eine **Verteilungsannahme**: Normalverteilung für stetige, $\mathcal{B}(1, \pi_i)$ für binäre AVs.
+
+::: {.fragment fragment-index=1}
+2. Weil $\pi_i$ zwischen 0 und 1 liegt, modellieren wir die **Log-Odds** von $\pi_i$ als lineare Funktion von $x$.
+:::
+:::
+
+::: {.fragment fragment-index=2}
+**Als Nächstes:** Was bedeutet $\beta_1$? Odds Ratios · Schätzung · in R:
+
+```r
+glm(remission ~ sitzungen, family = binomial, data = remission_data)
+```
+:::
+
+:::: {.columns}
+::: {.column width="70%"}
+**Material, Daten und R-Code:**<br>
+[`r materials_url`](`r materials_url`)
+:::
+::: {.column width="30%"}
+```{r qr}
+#| fig-width: 2
+#| fig-height: 2
+#| fig-alt: "QR-Code zur Materialseite"
+if (requireNamespace("qrcode", quietly = TRUE)) {
+  plot(qrcode::qr_code(materials_url))
+}
+```
+:::
+::::
+
+::: {.notes}
+ABSCHLUSS (9:30–10:00), 2 Klicks. Die zwei Ideen in einem Satz:
+«Wir behalten die Struktur des Modells, tauschen die Verteilung aus [Klick] und
+transformieren den Parameter so, dass der lineare Teil passt.»
+[Klick] Ausblick: was β1 = 0.15 heisst (Odds-Verhältnis pro Sitzung), dann glm() in R.
+:::
+
+## Backup: β₁ verdoppelt {visibility="uncounted"}
+
+![](figures/fig5_s_kurve_beta1_doppelt.png){fig-alt="Zwei S-Kurven: durchgezogen mit Beta1 gleich 0.15, gestrichelt mit Beta1 gleich 0.30. Die gestrichelte Kurve ist steiler und erreicht 0.5 schon bei 10 statt bei 20 Sitzungen." width="85%"}
+
+π = .5 bei $x = -\beta_0/\beta_1$: `r x_mid` Sitzungen ($\beta_1 = `r beta1`$) vs. `r x_mid2` Sitzungen ($\beta_1 = `r 2 * beta1`$).

@@ -1,0 +1,7 @@
+"parameter","value"
+"seed",2910
+"n_patients",200
+"x_min",1
+"x_max",40
+"beta0",-3
+"beta1",0.15

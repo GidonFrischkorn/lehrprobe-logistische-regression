@@ -1,0 +1,91 @@
+---
+title: "Logistische Regression: Material zur Lehrprobe"
+subtitle: "Ausschnitt aus einer BSc-Statistikvorlesung · 10 Minuten"
+author: "Gidon T. Frischkorn"
+lang: de
+format:
+  html:
+    toc: true
+    code-copy: true
+---
+
+Diese Seite enthält alle Materialien zum zehnminütigen Vorlesungsausschnitt
+zur logistischen Regression: die Folien, die simulierten Daten und den
+vollständigen R-Code, mit dem alle Zahlen und Abbildungen der Folien erzeugt
+werden.
+
+- **Folien:** [slides.html](slides.html) (im Browser; Taste `s` öffnet die Notizen)
+- **Daten:** [data/remission.csv](data/remission.csv)
+
+## Worum es geht
+
+Der Ausschnitt verfolgt zwei Ideen:
+
+1. **Jedes statistische Modell ist eine Verteilungsannahme.** Die lineare
+   Regression nimmt an, dass $Y_i \sim \mathcal{N}(\mu_i, \sigma^2)$ mit
+   $\mu_i = \beta_0 + \beta_1 x_i$. Eine binäre abhängige Variable braucht eine
+   andere Verteilung: $Y_i \sim \mathcal{B}(1, \pi_i)$. Die Struktur bleibt
+   gleich: eine Verteilung und ein Parameter, der von $x$ abhängt.
+2. **$\pi_i$ liegt zwischen 0 und 1, $\beta_0 + \beta_1 x_i$ nicht.** Deshalb
+   wird $\pi_i$ schrittweise transformiert: Wahrscheinlichkeit (0 bis 1) →
+   Odds $\pi/(1-\pi)$ (0 bis ∞) → Log-Odds (−∞ bis ∞). Das logistische
+   Regressionsmodell lautet
+   $\ln\!\left(\frac{\pi_i}{1-\pi_i}\right) = \beta_0 + \beta_1 x_i$.
+
+## Das Beispiel
+
+```{r params}
+#| echo: false
+p <- read.csv("output/sim_params.csv")
+knitr::kable(p, col.names = c("Parameter", "Wert"))
+```
+
+Die Daten sind **simuliert**. `r p$value[p$parameter == "n_patients"]`
+Patient:innen erhalten zwischen `r p$value[p$parameter == "x_min"]` und
+`r p$value[p$parameter == "x_max"]` Therapiesitzungen; die Wahrscheinlichkeit
+einer Remission folgt dem logistischen Modell mit den Parametern oben. Die
+Zahlen illustrieren das Modell und sind keine Schätzung realer
+Remissionsraten. Ob mehr Sitzungen Remission *verursachen*, lässt sich mit
+solchen Beobachtungsdaten ohnehin nicht beantworten.
+
+## R-Code
+
+Die drei Skripte werden in dieser Reihenfolge aus dem Projektordner
+ausgeführt. Beim Rendern der Folien laufen sie automatisch.
+
+### 1. Daten simulieren
+
+```{r}
+#| eval: false
+#| file: R/01_simulate_data.R
+```
+
+### 2. Zahlen für die Folien berechnen
+
+```{r}
+#| eval: false
+#| file: R/02_compute_numbers.R
+```
+
+### 3. Abbildungen erstellen
+
+```{r}
+#| eval: false
+#| file: R/03_figures.R
+```
+
+## Selbst ausprobieren
+
+- Verändern Sie in `01_simulate_data.R` den Wert von `beta1`. Wie verändert sich
+  die Abbildung `fig2_lineare_regression.png`? Ab welchem Wert liegen keine
+  Vorhersagen der linearen Regression mehr ausserhalb von [0, 1]?
+- Berechnen Sie Odds und Log-Odds für $\pi = .1$ und $\pi = .9$. Was fällt auf?
+- Schätzen Sie das Modell mit
+  `glm(remission ~ sitzungen, family = binomial, data = remission_data)`.
+  Wie nahe liegen die Schätzungen an den wahren Werten $\beta_0 = -3$ und
+  $\beta_1 = 0.15$?
+
+## Lizenz
+
+Folien und Texte: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+R-Code: MIT-Lizenz. Siehe `LICENSE` (MIT) und `LICENSE-CC-BY-4.0.txt` (CC BY 4.0).

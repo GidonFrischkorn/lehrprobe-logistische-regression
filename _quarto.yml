@@ -1,0 +1,28 @@
+project:
+  type: website
+  output-dir: docs
+  resources:
+    - data/
+    - R/
+  render:
+    - index.qmd
+    - slides.qmd
+
+website:
+  title: "Lehrprobe: Logistische Regression"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Materialien
+      - href: slides.qmd
+        text: Folien
+    right:
+      - icon: github
+        href: https://github.com/GidonFrischkorn/lehrprobe-logistische-regression
+  page-footer:
+    left: "Gidon Frischkorn, 2026 · Folien und Texte CC BY 4.0, Code MIT"
+
+execute:
+  freeze: false
+
+lang: de

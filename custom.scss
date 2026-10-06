@@ -1,0 +1,166 @@
+/*-- scss:defaults --*/
+$body-bg: #ffffff;
+$body-color: #1f2328;
+$link-color: #0072B2;
+$presentation-heading-color: #12355b;
+$presentation-font-size-root: 34px;
+$presentation-heading-font-weight: 600;
+
+/*-- scss:rules --*/
+.reveal h2 {
+  font-size: 1.45em;
+  margin-bottom: 0.4em;
+}
+
+.reveal .slide-subtitle {
+  color: #5a6470;
+  font-size: 0.8em;
+}
+
+// Einordnung: wo steht der Ausschnitt in der Vorlesung
+.timeline {
+  display: flex;
+  gap: 0.6em;
+  margin-top: 1em;
+}
+.timeline > div {
+  flex: 1;
+  border: 2px solid #c9d1da;
+  border-radius: 10px;
+  padding: 0.5em 0.7em;
+  font-size: 0.85em;
+  color: #5a6470;
+}
+.timeline > div.now {
+  border-color: #0072B2;
+  background: #eaf3fa;
+  color: #1f2328;
+  font-weight: 600;
+}
+.timeline .label {
+  display: block;
+  font-size: 0.8em;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.2em;
+}
+
+// Klicker-Frage und Denkpausen
+.klicker {
+  border-left: 8px solid #E69F00;
+  background: #fff6e0;
+  padding: 0.4em 0.8em;
+  border-radius: 6px;
+  font-size: 0.8em;
+}
+.denkpause {
+  border-left: 8px solid #E69F00;
+  background: #fff6e0;
+  padding: 0.3em 0.8em;
+  border-radius: 6px;
+}
+.merke {
+  border-left: 8px solid #0072B2;
+  background: #eaf3fa;
+  padding: 0.3em 0.8em;
+  border-radius: 6px;
+}
+
+.reveal .lm { color: #D55E00; font-weight: 600; }
+.reveal .logit { color: #0072B2; font-weight: 600; }
+
+.reveal table.transform {
+  font-size: 0.85em;
+  margin: 0.4em auto;
+}
+.reveal table.transform th,
+.reveal table.transform td {
+  padding: 0.2em 0.9em;
+  text-align: right;
+}
+
+table.leiter {
+  margin: 0.3em 0 0.5em 0;
+  border-collapse: collapse;
+  font-size: 0.95em;
+}
+table.leiter td {
+  padding: 0.15em 1.2em 0.15em 0;
+  border: none;
+  vertical-align: middle;
+}
+table.leiter td.range {
+  font-weight: 600;
+  color: #12355b;
+}
+
+// Slider-Widget
+.logit-widget svg {
+  display: block;
+  margin: 0 auto;
+  width: 100%;
+  height: 450px;
+}
+.logit-widget .slider-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1em;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7em;
+  margin-bottom: 0.2em;
+}
+.logit-widget input[type="range"] {
+  width: 220px;
+  vertical-align: middle;
+}
+.logit-widget button {
+  font-size: 0.9em;
+  padding: 0.1em 0.6em;
+}
+
+.small-note {
+  font-size: 0.6em;
+  color: #5a6470;
+}
+
+// Schrittweiser Aufbau (Fragmente)
+// Folie 6: Zahlenstrahl je Leiterzeile, gleiche Breite, damit 0 und 1 untereinander liegen
+table.leiter img.zahlenstrahl {
+  display: block;
+  width: 380px;
+  height: auto;
+  margin: 0;
+}
+// Folie 7: Zeilen .20 und .80 hervorheben (Fragment-Stil "custom" bleibt sichtbar)
+.reveal table.transform tr.hl-row td {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+.reveal table.transform tr.hl-row.visible td {
+  background: #eaf3fa;
+  color: #0072B2;
+  font-weight: 600;
+}
+// Folie 10: Merke-Punkt 2 erscheint als eigene Liste
+.merke ol {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
+}
+// Folie 4: Ebenen fest in der Höhe, damit der Text darunter über der Fusszeile bleibt
+.reveal .r-stack.layers > p {
+  margin: 0;
+  width: 100%;
+  text-align: center;
+}
+.reveal .r-stack.layers img {
+  height: 440px;
+  width: auto;
+  margin: 0;
+}
+// Folie 8: kompaktere Formeln in der linken Spalte
+.reveal .modell-links mjx-container[display="true"] {
+  margin: 0.3em 0 !important;
+}
+.reveal .modell-links p {
+  margin: 0.3em 0;
+}
