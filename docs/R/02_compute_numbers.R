@@ -71,3 +71,15 @@ glm_numbers <- data.frame(
 )
 write.csv(glm_numbers, "output/glm_numbers.csv", row.names = FALSE)
 print(summary(fit_glm)$coefficients)
+
+# (e) Zahlen für die Klicker-Items (Selbsttest am Ende) ----------------------
+# Der Selbsttest verwendet einen Wert, der auf den Folien nicht vorkommt,
+# damit die Aussage gerechnet und nicht erinnert wird.
+pi_check <- 0.75
+klicker_numbers <- data.frame(
+  quantity = c("pi_check", "odds_check", "log_odds_check"),
+  value    = c(pi_check, pi_check / (1 - pi_check), qlogis(pi_check))
+)
+stopifnot(isTRUE(all.equal(klicker_numbers$value[2], 3)))
+write.csv(klicker_numbers, "output/klicker_numbers.csv", row.names = FALSE)
+print(klicker_numbers)

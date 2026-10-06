@@ -5,9 +5,15 @@ author: "Gidon T. Frischkorn"
 date: "2026-10-29"
 date-format: "D. MMMM YYYY"
 lang: de
+# KlickerUZH-Beitrittslink: Konto-Link https://pwa.klicker.uzh.ch/join/{shortname}
+# (leitet auf das einzige laufende Live-Quiz weiter) oder der direkte Quiz-Link aus
+# der Aktivitätenliste. Leer lassen = Platzhalter statt QR auf den Folien.
+# Nach dem Eintragen: quarto render, dann jeden QR scannen (teaching-demo/tools).
+klicker-join-url: ""
 format:
   revealjs:
     theme: [default, custom.scss]
+    template-partials: [title-slide.html]
     width: 1280
     height: 720
     slide-number: c/t
@@ -48,9 +54,40 @@ x_mid2   <- get_val("true_curve.csv", "x_at_pi_50_beta1_doubled")
 tt       <- read.csv("output/transform_table.csv")
 odds_80  <- tt$odds[tt$pi == 0.8]
 
-f2 <- function(x) formatC(x, format = "f", digits = 2)
+f2 <- function(x) sub("^-", "\u2212", formatC(x, format = "f", digits = 2))
 pct <- function(x) paste0(formatC(100 * x, format = "f", digits = 0), " %")
 materials_url <- "https://gidonfrischkorn.github.io/lehrprobe-logistische-regression/"
+
+# Zahlen für den Selbsttest (Folie 10), aus R/02_compute_numbers.R
+kn         <- read.csv("output/klicker_numbers.csv")
+pi_check   <- kn$value[kn$quantity == "pi_check"]
+odds_check <- kn$value[kn$quantity == "odds_check"]
+fmt_pi <- function(x) sub("^0", "", formatC(x, format = "f", digits = 2))
+
+# KlickerUZH-Beitritt: ein QR aus dem Link in der YAML (klicker-join-url).
+# Ohne Link zeigen die Folien einen sichtbaren Platzhalter statt eines QR.
+klicker_join_url <- rmarkdown::metadata[["klicker-join-url"]]
+klicker_qr_file  <- "figures/klicker_qr.png"
+has_klicker <- !is.null(klicker_join_url) && nzchar(klicker_join_url) &&
+  requireNamespace("qrcode", quietly = TRUE)
+if (has_klicker) {
+  png(klicker_qr_file, width = 600, height = 600, bg = "white")
+  par(mar = c(0, 0, 0, 0)); plot(qrcode::qr_code(klicker_join_url, ecl = "M"))
+  dev.off()
+} else if (file.exists(klicker_qr_file)) {
+  file.remove(klicker_qr_file)   # kein veralteter QR auf den Folien
+}
+join_box <- function(px, label = "KlickerUZH") {
+  if (has_klicker) {
+    cat(sprintf(paste0(
+      '<div class="join-box"><img src="%s" width="%d" height="%d" ',
+      'alt="QR-Code: KlickerUZH beitreten, %s"><span>%s<br>%s</span></div>'),
+      klicker_qr_file, px, px, klicker_join_url, label,
+      sub("^https?://", "", klicker_join_url)))
+  } else {
+    cat(sprintf('<div class="join-box join-missing">%s: Link fehlt (klicker-join-url in slides.qmd)</div>', label))
+  }
+}
 ```
 
 ## Wo stehen wir?
@@ -105,16 +142,23 @@ B. Für manche Personen sagt die Gerade Werte unter 0 oder über 1 vorher.
 C. R bricht mit einer Fehlermeldung ab, weil $Y$ nur 0 und 1 enthält.
 :::
 
-[KlickerUZH-Link / QR hier einfügen]{.small-note}
+```{r join-slide3}
+#| results: asis
+join_box(150)
+```
 :::
 ::::
 
 ::: {.notes}
-KLICKER (0:30–2:00), keine Klicks: alle Optionen stehen von Anfang an. Frage in KlickerUZH vorbereitet (Single Choice A/B/C).
-Ansage: «Schätzen Sie, ohne zu rechnen. 45 Sekunden.»
-Abstimmung offen ~45 s, Ergebnis zeigen, NICHT auflösen: «Interessant, Sie sind sich
-nicht einig. Schauen wir nach.»
-Fallback ohne Netz: Handzeichen A/B/C.
+KLICKER (0:30–1:35), keine Klicks: alle Optionen stehen von Anfang an. Block 1 in
+KlickerUZH (Single Choice A/B/C, Countdown 35 s). Der QR stand schon auf der Titelfolie.
+[Klicker] Block 1 öffnen (Cockpit auf dem Handy), dabei sagen: «Schätzen Sie, ohne zu
+rechnen, 30 Sekunden. Wer noch nicht drin ist: QR rechts.» Dann, während sie tippen:
+«Unter der Frage sehen Sie zwei Regler, Tempo und Schwierigkeit. Verschieben Sie die,
+wann immer Sie wollen, ich schaue nachher drauf.» (Live Feedback, Option b.)
+Block schliesst sich nach 35 s selbst; Balken auf dem Handy-Cockpit ablesen, NICHT
+auflösen: «Interessant, Sie sind sich nicht einig. Schauen wir nach.»
+Fallback ohne Netz / KlickerUZH: Handzeichen A/B/C (je Option kurz zählen lassen).
 Erwartung: viele A oder C. C ist falsch: R rechnet lm() mit 0/1 klaglos.
 :::
 
@@ -136,7 +180,7 @@ Vorhersage bei `r x_hi` Sitzungen: **`r f2(pred_hi)`**, also eine «Wahrscheinli
 :::
 
 ::: {.notes}
-AUFLÖSUNG (2:00–3:00), 3 Klicks. Start: nur die Punkte. «Schauen wir nach.»
+AUFLÖSUNG (1:35–2:35), 3 Klicks. Start: nur die Punkte. «Schauen wir nach.»
 [Klick] Gerade. Antwort B. «R rechnet das klaglos, keine Fehlermeldung» (gegen C).
 [Klick] Schattierte Bereiche: «Wahrscheinlichkeiten gibt es nur zwischen 0 und 1.»
 [Klick] Markierungen bei 1 und `r x_hi` Sitzungen + Textzeile: «Bei `r x_hi` Sitzungen
@@ -176,7 +220,7 @@ Gleiche Struktur: eine **Verteilung** und ein **Parameter, der von $x$ abhängt*
 :::
 
 ::: {.notes}
-IDEE 1 (3:00–5:00), 4 Klicks. Start: nur links.
+IDEE 1 (2:35–4:20), 4 Klicks. Start: nur links. (v3: −15 s; ℬ(n, π) nur als «aus Statistik I» nennen, das Rate-Beispiel mit 20 Fragen weglassen.)
 Links: Was sie kennen. Jede Person hat ihre eigene Normalverteilung; der Mittelwert
 mu_i liegt auf der Geraden.
 [Klick] Rechts Formel: Binäre AV braucht eine andere Verteilung. «Erinnern Sie sich an die
@@ -211,10 +255,12 @@ $.8 / .2 = `r odds_80`$: viermal so wahrscheinlich wie nicht. Kennen Sie aus dem
 :::
 
 ::: {.notes}
-IDEE 2 (5:00–7:00), 5 Klicks (wie bisher; die Zahlenstrahlen kommen mit ihrer Zeile).
+IDEE 2 (4:20–6:10), 5 Klicks (die Zahlenstrahlen kommen mit ihrer Zeile). v3: −10 s; die Frage «kleinster, grösster Wert?» nur bei Odds und Log-Odds (der Bereich von π ist die Prämisse), Denkpause 15 s.
 [Klick] Wahrscheinlichkeit, [Klick] Odds, [Klick] Log-Odds; jeweils «Was ist der
 kleinste, was der grösste Wert?» Auf den Zahlenstrahl zeigen: der Bereich wächst.
-[Klick] DENKPAUSE, 20 Sekunden, Antwort aus dem Raum holen (4). [Klick] Auflösung.
+[Klick] DENKPAUSE, 15 Sekunden, Antwort aus dem Raum holen (4). [Klick] Auflösung.
+Symmetrie mündlich (Folie 7 ist Reserve): «.2 und .8 liegen symmetrisch um 0.»
+Danach im Normalfall **G 8 Enter** (Folie 7 überspringen); Folie 7 nur, wenn hier ≤ 5:45.
 Anknüpfen an Statistik I: odds_prior <- 0.8/0.2, und zurück mit odds/(1 + odds).
 Log-Odds: ln von Werten zwischen 0 und 1 ist negativ, ln(1) = 0, ln von Werten > 1
 positiv. Damit ist der ganze Zahlenstrahl abgedeckt.
@@ -241,10 +287,11 @@ $\pi = .5$ wird zu Log-Odds 0. Gleich wahrscheinlich und gleich unwahrscheinlich
 :::
 
 ::: {.notes}
-(7:00–7:30), 2 Klicks. Nur kurz zeigen, nicht vorlesen.
-[Klick] Zeilen .20 und .80 hervorgehoben: ±1.39. [Klick] Merke-Box.
-Optional kürzen: Diese Folie kann übersprungen werden (Kürzungspunkt B; mit G 8 Enter
-direkt zur nächsten Folie, sonst dreimal weiterklicken).
+RESERVE (v3): Diese Folie wird im Normalfall übersprungen, damit der Selbsttest am Ende
+Platz hat. Auf Folie 6 nach der Auflösung **G 8 Enter** (landet auf Folie 8 mit
+verborgenen Aufbauten). Nur zeigen, wenn Folie 6 bei 5:45 oder früher fertig ist.
+Dann 2 Klicks, 30 s: [Klick] Zeilen .20 und .80 hervorgehoben: ±1.39. [Klick] Merke-Box.
+Die Symmetrie (π = .5 → Log-Odds 0) kommt sonst mündlich auf Folie 6.
 :::
 
 ## Das logistische Regressionsmodell
@@ -289,7 +336,7 @@ $$
 ::::
 
 ::: {.notes}
-(7:30–8:30), 4 Klicks. Start: «pi_i = ?» wie auf Folie 5.
+(6:10–7:10), 4 Klicks. Start: «pi_i = ?» wie auf Folie 5.
 [Klick] Logit-Gleichung ersetzt das Fragezeichen. Der lineare Teil bleibt: links steht
 jetzt logit(pi_i) statt mu_i.
 [Klick] Zurückrechnen, erster Schritt (blau): e hoch Log-Odds gibt die Odds.
@@ -434,28 +481,74 @@ cat("<script>window.remissionData = ",
 ```
 
 ::: {.notes}
-DENKPAUSE + SLIDER (8:30–9:30).
+DENKPAUSE + SLIDER (7:10–7:55), kein Folienklick.
+Vorher, noch auf Folie 8: [Cockpit] Blick aufs Handy (Live Feedback): «Kurzer
+Blick auf Ihre Regler: Tempo … , Schwierigkeit … .» Bei «zu schnell»: Denkpause hier
+20 s statt 15 s. Bei weniger als ~5 Eingaben: nichts sagen.
 Erst fragen, dann schieben: «β1 von 0.15 auf 0.30. Wird die Kurve steiler, flacher,
 oder verschiebt sie sich? Kurz mit Ihrem Nebenan besprechen.» (15 s)
 Dann «Animieren» klicken (Maus, kein Folienklick): β1 läuft in 1.5 s von 0.15 auf
-0.30. Alternativ von Hand schieben. Auflösung: steiler UND der Punkt mit π = .5 wandert von
+0.30. Auflösung: steiler UND der Punkt mit π = .5 wandert von
 x = `r x_mid` nach x = `r x_mid2` (weil π = .5 bei x = −β0/β1).
-Negatives β1 kurz zeigen: Kurve fällt.
+Kein negatives β1 mehr (v3: die 15 s gehen in den Selbsttest). Falls jemand fragt:
+«Kurve fällt», einmal kurz schieben.
 Fallback (kein Browser/JS): Backup-Folie am Ende (fig5).
-Kürzungspunkt A: Bei Zeitnot nur die Frage stellen, «Animieren», kein negatives β1.
+Entscheidung am Ende dieser Folie (Stoppuhr): bis 8:10 → Selbsttest voll; 8:10–8:35 →
+Selbsttest kurz (Block nach 25 s von Hand schliessen, zwei Sätze); nach 8:35 → kein
+Selbsttest: G 11 Enter, Mitnehmen selbst sagen.
+:::
+
+## Haben Sie es? Vier Aussagen, richtig oder falsch {.selbsttest}
+
+:::: {.columns}
+::: {.column width="72%"}
+::: {.klicker}
+**KlickerUZH (K-Prim):** Markieren Sie jede Aussage als richtig oder falsch.
+
+A. $\mathcal{B}(1, \pi_i)$ gibt jeder Person ein eigenes $\pi_i$, so wie $\mathcal{N}(\mu_i, \sigma^2)$ jeder Person ein eigenes $\mu_i$ gibt.
+
+B. In der logistischen Regression ist $\pi_i$ eine lineare Funktion der Anzahl Sitzungen $x_i$.
+
+C. Wenn $\pi = `r fmt_pi(pi_check)`$, betragen die Odds $`r odds_check`$.
+
+D. Log-Odds liegen wie Wahrscheinlichkeiten zwischen 0 und 1.
+:::
+:::
+::: {.column width="28%"}
+```{r join-slide10}
+#| results: asis
+join_box(130, "40 Sekunden")
+```
+:::
+::::
+
+::: {.notes}
+SELBSTTEST (7:55–9:20), keine Klicks. Block 2 in KlickerUZH (KPRIM, Countdown 40 s).
+Die vier Sätze stehen hier wie in KlickerUZH, damit auch mitliest, wer nicht drin ist.
+[Klicker] Block 2 öffnen, dabei: «Zum Schluss prüfen Sie selbst: vier Aussagen,
+richtig oder falsch, 40 Sekunden.» Nicht kommentieren, warten.
+Block schliesst sich nach 40 s selbst (früher von Hand, wenn die Balken stehen).
+[Fenster] Ctrl+Tab zum KlickerUZH-Auswertungstab (Balkendiagramm, Lösung einblenden).
+Pro Aussage ein Satz, in dieser Reihenfolge (= Merke-Punkte):
+A richtig: «Gleiche Struktur, andere Verteilung: ein Parameter pro Person, der von x abhängt.»
+B falsch: «Linear sind die Log-Odds. π folgt der S-Kurve und bleibt zwischen 0 und 1.»
+C richtig: «`r fmt_pi(pi_check)` durch `r fmt_pi(1 - pi_check)` ist `r odds_check`: drei Remissionen auf eine Nicht-Remission.»
+D falsch: «Log-Odds laufen von minus bis plus unendlich; unter π = .5 sind sie negativ.
+Genau deshalb passt die Gerade.»
+Bei einem Balken mit vielen Fehlern: diesen Satz zuerst, und er ist der erste Satz der Diskussion.
+[Fenster] Ctrl+Tab zurück zu den Folien, weiter zu Mitnehmen.
+Fallback ohne Netz: Handzeichen je Aussage («Wer sagt richtig?»), gleiche vier Sätze.
+Fallback < 8 Teilnehmende: Block trotzdem öffnen, aber statt Balken zwei Personen fragen.
 :::
 
 ## Mitnehmen
 
 ::: {.merke}
 1. Jedes statistische Modell ist eine **Verteilungsannahme**: Normalverteilung für stetige, $\mathcal{B}(1, \pi_i)$ für binäre AVs.
-
-::: {.fragment fragment-index=1}
 2. Weil $\pi_i$ zwischen 0 und 1 liegt, modellieren wir die **Log-Odds** von $\pi_i$ als lineare Funktion von $x$.
 :::
-:::
 
-::: {.fragment fragment-index=2}
+::: {.fragment fragment-index=1}
 **Als Nächstes:** Was bedeutet $\beta_1$? Odds Ratios · Schätzung · in R:
 
 ```r
@@ -481,10 +574,13 @@ if (requireNamespace("qrcode", quietly = TRUE)) {
 ::::
 
 ::: {.notes}
-ABSCHLUSS (9:30–10:00), 2 Klicks. Die zwei Ideen in einem Satz:
-«Wir behalten die Struktur des Modells, tauschen die Verteilung aus [Klick] und
-transformieren den Parameter so, dass der lineare Teil passt.»
-[Klick] Ausblick: was β1 = 0.15 heisst (Odds-Verhältnis pro Sitzung), dann glm() in R.
+ABSCHLUSS (9:20–9:30), 1 Klick. Beide Merke-Punkte stehen sofort (v3: der Selbsttest
+hat sie gerade aufgelöst). Nur zeigen: «Das sind die zwei Sätze zum Mitnehmen.»
+[Klick] Ausblick: «Als Nächstes: was β1 = 0.15 heisst, Odds Ratios, dann glm() in R.
+Material und Daten unter dem Link.»
+Ohne Selbsttest (Notbremse, G 11 Enter): die zwei Sätze selbst sagen (30 s):
+«Wir behalten die Struktur des Modells, tauschen die Verteilung aus und transformieren
+den Parameter so, dass der lineare Teil passt.» Dann derselbe eine Klick: Ausblick.
 :::
 
 ## Backup: β₁ verdoppelt {visibility="uncounted"}

@@ -414,7 +414,19 @@ window.Quarto = {
 <span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a>  <span class="at">value    =</span> <span class="fu">unname</span>(<span class="fu">coef</span>(fit_glm))</span>
 <span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(glm_numbers, <span class="st">"output/glm_numbers.csv"</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">summary</span>(fit_glm)<span class="sc">$</span>coefficients)</span></code></pre></div><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">summary</span>(fit_glm)<span class="sc">$</span>coefficients)</span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a><span class="co"># (e) Zahlen für die Klicker-Items (Selbsttest am Ende) ----------------------</span></span>
+<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a><span class="co"># Der Selbsttest verwendet einen Wert, der auf den Folien nicht vorkommt,</span></span>
+<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a><span class="co"># damit die Aussage gerechnet und nicht erinnert wird.</span></span>
+<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a>pi_check <span class="ot">&lt;-</span> <span class="fl">0.75</span></span>
+<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a>klicker_numbers <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a>  <span class="at">quantity =</span> <span class="fu">c</span>(<span class="st">"pi_check"</span>, <span class="st">"odds_check"</span>, <span class="st">"log_odds_check"</span>),</span>
+<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a>  <span class="at">value    =</span> <span class="fu">c</span>(pi_check, pi_check <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">-</span> pi_check), <span class="fu">qlogis</span>(pi_check))</span>
+<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="fu">isTRUE</span>(<span class="fu">all.equal</span>(klicker_numbers<span class="sc">$</span>value[<span class="dv">2</span>], <span class="dv">3</span>)))</span>
+<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(klicker_numbers, <span class="st">"output/klicker_numbers.csv"</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(klicker_numbers)</span></code></pre></div><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="abbildungen-erstellen" class="level3">

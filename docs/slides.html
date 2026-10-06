@@ -101,7 +101,7 @@
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-5abf1741b18e9042f48207ee4496ec6b.css">
+  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-04c70f5df63746505163faa0739a7da6.css">
   <link href="site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -198,18 +198,10 @@
   <div class="reveal">
     <div class="slides">
 
-<section id="title-slide" class="quarto-title-block center">
+<section id="title-slide" class="center">
   <h1 class="title">Logistische Regression</h1>
   <p class="subtitle">Wenn die abhängige Variable nur 0 oder 1 kennt</p>
-
-<div class="quarto-title-authors">
-<div class="quarto-title-author">
-<div class="quarto-title-author-name">
-Gidon T. Frischkorn
-</div>
-</div>
-</div>
-
+  <p class="author">Gidon T. Frischkorn</p>
   <p class="date">29. Oktober 2026</p>
 </section>
 <section id="wo-stehen-wir" class="slide level2">
@@ -255,10 +247,12 @@ Gidon T. Frischkorn
 <p>B. Für manche Personen sagt die Gerade Werte unter 0 oder über 1 vorher.</p>
 <p>C. R bricht mit einer Fehlermeldung ab, weil <span class="math inline">\(Y\)</span> nur 0 und 1 enthält.</p>
 </div>
-<p><span class="small-note">KlickerUZH-Link / QR hier einfügen</span></p>
+<div class="join-box join-missing">
+KlickerUZH: Link fehlt (klicker-join-url in slides.qmd)
+</div>
 </div></div>
 <aside class="notes">
-<p>KLICKER (0:30–2:00), keine Klicks: alle Optionen stehen von Anfang an. Frage in KlickerUZH vorbereitet (Single Choice A/B/C). Ansage: «Schätzen Sie, ohne zu rechnen. 45 Sekunden.» Abstimmung offen ~45 s, Ergebnis zeigen, NICHT auflösen: «Interessant, Sie sind sich nicht einig. Schauen wir nach.» Fallback ohne Netz: Handzeichen A/B/C. Erwartung: viele A oder C. C ist falsch: R rechnet lm() mit 0/1 klaglos.</p>
+<p>KLICKER (0:30–1:35), keine Klicks: alle Optionen stehen von Anfang an. Block 1 in KlickerUZH (Single Choice A/B/C, Countdown 35 s). Der QR stand schon auf der Titelfolie. [Klicker] Block 1 öffnen (Cockpit auf dem Handy), dabei sagen: «Schätzen Sie, ohne zu rechnen, 30 Sekunden. Wer noch nicht drin ist: QR rechts.» Dann, während sie tippen: «Unter der Frage sehen Sie zwei Regler, Tempo und Schwierigkeit. Verschieben Sie die, wann immer Sie wollen, ich schaue nachher drauf.» (Live Feedback, Option b.) Block schliesst sich nach 35 s selbst; Balken auf dem Handy-Cockpit ablesen, NICHT auflösen: «Interessant, Sie sind sich nicht einig. Schauen wir nach.» Fallback ohne Netz / KlickerUZH: Handzeichen A/B/C (je Option kurz zählen lassen). Erwartung: viele A oder C. C ist falsch: R rechnet lm() mit 0/1 klaglos.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -277,13 +271,13 @@ Gidon T. Frischkorn
 <p><img data-src="figures/fig2_0_punkte.png" alt="Streudiagramm: Remission (0 = nein, 1 = ja) gegen Anzahl Therapiesitzungen von 1 bis 40, dieselben Daten wie auf der Klicker-Folie."></p>
 <p><img data-src="figures/fig2_1_gerade.png" class="fragment" data-fragment-index="1" alt="Dieselben Daten mit der Regressionsgeraden der linearen Regression. Die Gerade steigt von links unten nach rechts oben."></p>
 <p><img data-src="figures/fig2_2_bereiche.png" class="fragment" data-fragment-index="2" alt="Dieselben Daten mit der Regressionsgeraden. Die Bereiche unter 0 und über 1 sind orange schattiert; die Gerade liegt links unter 0 und rechts über 1."></p>
-<p><img data-src="figures/fig2_3_vorhersagen.png" class="fragment" data-fragment-index="3" alt="Wie zuvor, zusätzlich sind die Vorhersagen der Geraden bei 1 und bei 40 Sitzungen als Kreise markiert und beschriftet: -0.04 und 1.11."></p>
+<p><img data-src="figures/fig2_3_vorhersagen.png" class="fragment" data-fragment-index="3" alt="Wie zuvor, zusätzlich sind die Vorhersagen der Geraden bei 1 und bei 40 Sitzungen als Kreise markiert und beschriftet: −0.04 und 1.11."></p>
 </div>
 <div class="fragment" data-fragment-index="3">
-<p>Vorhersage bei 40 Sitzungen: <strong>1.11</strong>, also eine «Wahrscheinlichkeit» von 111 %? Bei 1 Sitzung: <strong>-0.04</strong>. 20 von 200 vorhergesagten Werten liegen ausserhalb von [0, 1].</p>
+<p>Vorhersage bei 40 Sitzungen: <strong>1.11</strong>, also eine «Wahrscheinlichkeit» von 111 %? Bei 1 Sitzung: <strong>−0.04</strong>. 20 von 200 vorhergesagten Werten liegen ausserhalb von [0, 1].</p>
 </div>
 <aside class="notes">
-<p>AUFLÖSUNG (2:00–3:00), 3 Klicks. Start: nur die Punkte. «Schauen wir nach.» [Klick] Gerade. Antwort B. «R rechnet das klaglos, keine Fehlermeldung» (gegen C). [Klick] Schattierte Bereiche: «Wahrscheinlichkeiten gibt es nur zwischen 0 und 1.» [Klick] Markierungen bei 1 und 40 Sitzungen + Textzeile: «Bei 40 Sitzungen sagt die Gerade 1.11 vorher, eine Wahrscheinlichkeit von 111 %.» Kernsatz: «Die Gerade weiss nicht, dass es eine Wahrscheinlichkeit beschreiben soll.» Überleitung: «Das Problem liegt nicht in der Geraden, sondern im Modell dahinter. Dafür gehen wir einen Schritt zurück.»</p>
+<p>AUFLÖSUNG (1:35–2:35), 3 Klicks. Start: nur die Punkte. «Schauen wir nach.» [Klick] Gerade. Antwort B. «R rechnet das klaglos, keine Fehlermeldung» (gegen C). [Klick] Schattierte Bereiche: «Wahrscheinlichkeiten gibt es nur zwischen 0 und 1.» [Klick] Markierungen bei 1 und 40 Sitzungen + Textzeile: «Bei 40 Sitzungen sagt die Gerade 1.11 vorher, eine Wahrscheinlichkeit von 111 %.» Kernsatz: «Die Gerade weiss nicht, dass es eine Wahrscheinlichkeit beschreiben soll.» Überleitung: «Das Problem liegt nicht in der Geraden, sondern im Modell dahinter. Dafür gehen wir einen Schritt zurück.»</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -317,7 +311,7 @@ Gidon T. Frischkorn
 <p>Gleiche Struktur: eine <strong>Verteilung</strong> und ein <strong>Parameter, der von <span class="math inline">\(x\)</span> abhängt</strong>.</p>
 </div>
 <aside class="notes">
-<p>IDEE 1 (3:00–5:00), 4 Klicks. Start: nur links. Links: Was sie kennen. Jede Person hat ihre eigene Normalverteilung; der Mittelwert mu_i liegt auf der Geraden. [Klick] Rechts Formel: Binäre AV braucht eine andere Verteilung. «Erinnern Sie sich an die Binomialverteilung aus Statistik I: X ~ B(n, pi), Anzahl richtige Antworten, wenn man bei 20 Single-Choice-Fragen rät. Hier ziehen wir pro Person genau einmal: n = 1.» (B(1, pi) heisst auch Bernoulli-Verteilung.) [Klick] Balken: bei 5 Sitzungen meist 0, bei 35 meist 1. [Klick] Kreise: Die Kreise sind pi_i, der Mittelwert der 0/1-Variable. Frage an den Raum: «Was liegt nahe für pi_i?» → «Die Gerade wie links!» [Klick] Merke-Box: gleiche Struktur. Genau das hat die lineare Regression gemacht, und das ging schief. Warum?</p>
+<p>IDEE 1 (2:35–4:20), 4 Klicks. Start: nur links. (v3: −15 s; ℬ(n, π) nur als «aus Statistik I» nennen, das Rate-Beispiel mit 20 Fragen weglassen.) Links: Was sie kennen. Jede Person hat ihre eigene Normalverteilung; der Mittelwert mu_i liegt auf der Geraden. [Klick] Rechts Formel: Binäre AV braucht eine andere Verteilung. «Erinnern Sie sich an die Binomialverteilung aus Statistik I: X ~ B(n, pi), Anzahl richtige Antworten, wenn man bei 20 Single-Choice-Fragen rät. Hier ziehen wir pro Person genau einmal: n = 1.» (B(1, pi) heisst auch Bernoulli-Verteilung.) [Klick] Balken: bei 5 Sitzungen meist 0, bei 35 meist 1. [Klick] Kreise: Die Kreise sind pi_i, der Mittelwert der 0/1-Variable. Frage an den Raum: «Was liegt nahe für pi_i?» → «Die Gerade wie links!» [Klick] Merke-Box: gleiche Struktur. Genau das hat die lineare Regression gemacht, und das ging schief. Warum?</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -362,7 +356,7 @@ Gidon T. Frischkorn
 <p><span class="math inline">\(.8 / .2 = 4\)</span>: viermal so wahrscheinlich wie nicht. Kennen Sie aus dem Bayes-Beispiel (Prior-Odds).</p>
 </div>
 <aside class="notes">
-<p>IDEE 2 (5:00–7:00), 5 Klicks (wie bisher; die Zahlenstrahlen kommen mit ihrer Zeile). [Klick] Wahrscheinlichkeit, [Klick] Odds, [Klick] Log-Odds; jeweils «Was ist der kleinste, was der grösste Wert?» Auf den Zahlenstrahl zeigen: der Bereich wächst. [Klick] DENKPAUSE, 20 Sekunden, Antwort aus dem Raum holen (4). [Klick] Auflösung. Anknüpfen an Statistik I: odds_prior &lt;- 0.8/0.2, und zurück mit odds/(1 + odds). Log-Odds: ln von Werten zwischen 0 und 1 ist negativ, ln(1) = 0, ln von Werten &gt; 1 positiv. Damit ist der ganze Zahlenstrahl abgedeckt.</p>
+<p>IDEE 2 (4:20–6:10), 5 Klicks (die Zahlenstrahlen kommen mit ihrer Zeile). v3: −10 s; die Frage «kleinster, grösster Wert?» nur bei Odds und Log-Odds (der Bereich von π ist die Prämisse), Denkpause 15 s. [Klick] Wahrscheinlichkeit, [Klick] Odds, [Klick] Log-Odds; jeweils «Was ist der kleinste, was der grösste Wert?» Auf den Zahlenstrahl zeigen: der Bereich wächst. [Klick] DENKPAUSE, 15 Sekunden, Antwort aus dem Raum holen (4). [Klick] Auflösung. Symmetrie mündlich (Folie 7 ist Reserve): «.2 und .8 liegen symmetrisch um 0.» Danach im Normalfall <strong>G 8 Enter</strong> (Folie 7 überspringen); Folie 7 nur, wenn hier ≤ 5:45. Anknüpfen an Statistik I: odds_prior &lt;- 0.8/0.2, und zurück mit odds/(1 + odds). Log-Odds: ln von Werten zwischen 0 und 1 ist negativ, ln(1) = 0, ln von Werten &gt; 1 positiv. Damit ist der ganze Zahlenstrahl abgedeckt.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -453,7 +447,7 @@ Log-Odds ln(π/(1−π))
 <p><span class="math inline">\(\pi = .5\)</span> wird zu Log-Odds 0. Gleich wahrscheinlich und gleich unwahrscheinlich liegen symmetrisch um 0.</p>
 </div>
 <aside class="notes">
-<p>(7:00–7:30), 2 Klicks. Nur kurz zeigen, nicht vorlesen. [Klick] Zeilen .20 und .80 hervorgehoben: ±1.39. [Klick] Merke-Box. Optional kürzen: Diese Folie kann übersprungen werden (Kürzungspunkt B; mit G 8 Enter direkt zur nächsten Folie, sonst dreimal weiterklicken).</p>
+<p>RESERVE (v3): Diese Folie wird im Normalfall übersprungen, damit der Selbsttest am Ende Platz hat. Auf Folie 6 nach der Auflösung <strong>G 8 Enter</strong> (landet auf Folie 8 mit verborgenen Aufbauten). Nur zeigen, wenn Folie 6 bei 5:45 oder früher fertig ist. Dann 2 Klicks, 30 s: [Klick] Zeilen .20 und .80 hervorgehoben: ±1.39. [Klick] Merke-Box. Die Symmetrie (π = .5 → Log-Odds 0) kommt sonst mündlich auf Folie 6.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -500,7 +494,7 @@ Log-Odds ln(π/(1−π))
 </div>
 </div></div>
 <aside class="notes">
-<p>(7:30–8:30), 4 Klicks. Start: «pi_i = ?» wie auf Folie 5. [Klick] Logit-Gleichung ersetzt das Fragezeichen. Der lineare Teil bleibt: links steht jetzt logit(pi_i) statt mu_i. [Klick] Zurückrechnen, erster Schritt (blau): e hoch Log-Odds gibt die Odds. [Klick] Zweiter Schritt (blau): Odds/(1 + Odds) gibt die Wahrscheinlichkeit. Dieselbe Formel wie im Bayes-Beispiel. [Klick] Ergebnis: Die S-Kurve. Sie bleibt zwischen 0 und 1, egal wie viele Sitzungen.</p>
+<p>(6:10–7:10), 4 Klicks. Start: «pi_i = ?» wie auf Folie 5. [Klick] Logit-Gleichung ersetzt das Fragezeichen. Der lineare Teil bleibt: links steht jetzt logit(pi_i) statt mu_i. [Klick] Zurückrechnen, erster Schritt (blau): e hoch Log-Odds gibt die Odds. [Klick] Zweiter Schritt (blau): Odds/(1 + Odds) gibt die Wahrscheinlichkeit. Dieselbe Formel wie im Bayes-Beispiel. [Klick] Ergebnis: Die S-Kurve. Sie bleibt zwischen 0 und 1, egal wie viele Sitzungen.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -636,7 +630,37 @@ Log-Odds ln(π/(1−π))
 })();
 </script>
 <aside class="notes">
-<p>DENKPAUSE + SLIDER (8:30–9:30). Erst fragen, dann schieben: «β1 von 0.15 auf 0.30. Wird die Kurve steiler, flacher, oder verschiebt sie sich? Kurz mit Ihrem Nebenan besprechen.» (15 s) Dann «Animieren» klicken (Maus, kein Folienklick): β1 läuft in 1.5 s von 0.15 auf 0.30. Alternativ von Hand schieben. Auflösung: steiler UND der Punkt mit π = .5 wandert von x = 20 nach x = 10 (weil π = .5 bei x = −β0/β1). Negatives β1 kurz zeigen: Kurve fällt. Fallback (kein Browser/JS): Backup-Folie am Ende (fig5). Kürzungspunkt A: Bei Zeitnot nur die Frage stellen, «Animieren», kein negatives β1.</p>
+<p>DENKPAUSE + SLIDER (7:10–7:55), kein Folienklick. Vorher, noch auf Folie 8: [Cockpit] Blick aufs Handy (Live Feedback): «Kurzer Blick auf Ihre Regler: Tempo … , Schwierigkeit … .» Bei «zu schnell»: Denkpause hier 20 s statt 15 s. Bei weniger als ~5 Eingaben: nichts sagen. Erst fragen, dann schieben: «β1 von 0.15 auf 0.30. Wird die Kurve steiler, flacher, oder verschiebt sie sich? Kurz mit Ihrem Nebenan besprechen.» (15 s) Dann «Animieren» klicken (Maus, kein Folienklick): β1 läuft in 1.5 s von 0.15 auf 0.30. Auflösung: steiler UND der Punkt mit π = .5 wandert von x = 20 nach x = 10 (weil π = .5 bei x = −β0/β1). Kein negatives β1 mehr (v3: die 15 s gehen in den Selbsttest). Falls jemand fragt: «Kurve fällt», einmal kurz schieben. Fallback (kein Browser/JS): Backup-Folie am Ende (fig5). Entscheidung am Ende dieser Folie (Stoppuhr): bis 8:10 → Selbsttest voll; 8:10–8:35 → Selbsttest kurz (Block nach 25 s von Hand schliessen, zwei Sätze); nach 8:35 → kein Selbsttest: G 11 Enter, Mitnehmen selbst sagen.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="haben-sie-es-vier-aussagen-richtig-oder-falsch" class="slide level2 selbsttest">
+<h2>Haben Sie es? Vier Aussagen, richtig oder falsch</h2>
+<div class="columns">
+<div class="column" style="width:72%;">
+<div class="klicker">
+<p><strong>KlickerUZH (K-Prim):</strong> Markieren Sie jede Aussage als richtig oder falsch.</p>
+<p>A. <span class="math inline">\(\mathcal{B}(1, \pi_i)\)</span> gibt jeder Person ein eigenes <span class="math inline">\(\pi_i\)</span>, so wie <span class="math inline">\(\mathcal{N}(\mu_i, \sigma^2)\)</span> jeder Person ein eigenes <span class="math inline">\(\mu_i\)</span> gibt.</p>
+<p>B. In der logistischen Regression ist <span class="math inline">\(\pi_i\)</span> eine lineare Funktion der Anzahl Sitzungen <span class="math inline">\(x_i\)</span>.</p>
+<p>C. Wenn <span class="math inline">\(\pi = .75\)</span>, betragen die Odds <span class="math inline">\(3\)</span>.</p>
+<p>D. Log-Odds liegen wie Wahrscheinlichkeiten zwischen 0 und 1.</p>
+</div>
+</div><div class="column" style="width:28%;">
+<div class="join-box join-missing">
+40 Sekunden: Link fehlt (klicker-join-url in slides.qmd)
+</div>
+</div></div>
+<aside class="notes">
+<p>SELBSTTEST (7:55–9:20), keine Klicks. Block 2 in KlickerUZH (KPRIM, Countdown 40 s). Die vier Sätze stehen hier wie in KlickerUZH, damit auch mitliest, wer nicht drin ist. [Klicker] Block 2 öffnen, dabei: «Zum Schluss prüfen Sie selbst: vier Aussagen, richtig oder falsch, 40 Sekunden.» Nicht kommentieren, warten. Block schliesst sich nach 40 s selbst (früher von Hand, wenn die Balken stehen). [Fenster] Ctrl+Tab zum KlickerUZH-Auswertungstab (Balkendiagramm, Lösung einblenden). Pro Aussage ein Satz, in dieser Reihenfolge (= Merke-Punkte): A richtig: «Gleiche Struktur, andere Verteilung: ein Parameter pro Person, der von x abhängt.» B falsch: «Linear sind die Log-Odds. π folgt der S-Kurve und bleibt zwischen 0 und 1.» C richtig: «.75 durch .25 ist 3: drei Remissionen auf eine Nicht-Remission.» D falsch: «Log-Odds laufen von minus bis plus unendlich; unter π = .5 sind sie negativ. Genau deshalb passt die Gerade.» Bei einem Balken mit vielen Fehlern: diesen Satz zuerst, und er ist der erste Satz der Diskussion. [Fenster] Ctrl+Tab zurück zu den Folien, weiter zu Mitnehmen. Fallback ohne Netz: Handzeichen je Aussage («Wer sagt richtig?»), gleiche vier Sätze. Fallback &lt; 8 Teilnehmende: Block trotzdem öffnen, aber statt Balken zwei Personen fragen.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -654,14 +678,10 @@ Log-Odds ln(π/(1−π))
 <div class="merke">
 <ol type="1">
 <li>Jedes statistische Modell ist eine <strong>Verteilungsannahme</strong>: Normalverteilung für stetige, <span class="math inline">\(\mathcal{B}(1, \pi_i)\)</span> für binäre AVs.</li>
-</ol>
-<div class="fragment" data-fragment-index="1">
-<ol start="2" type="1">
 <li>Weil <span class="math inline">\(\pi_i\)</span> zwischen 0 und 1 liegt, modellieren wir die <strong>Log-Odds</strong> von <span class="math inline">\(\pi_i\)</span> als lineare Funktion von <span class="math inline">\(x\)</span>.</li>
 </ol>
 </div>
-</div>
-<div class="fragment" data-fragment-index="2">
+<div class="fragment" data-fragment-index="1">
 <p><strong>Als Nächstes:</strong> Was bedeutet <span class="math inline">\(\beta_1\)</span>? Odds Ratios · Schätzung · in R:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a aria-label="1"></a><span class="fu">glm</span>(remission <span class="sc">~</span> sitzungen, <span class="at">family =</span> binomial, <span class="at">data =</span> remission_data)</span></code></pre></div><button title="In die Zwischenablage kopieren" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -680,7 +700,7 @@ Log-Odds ln(π/(1−π))
 </div>
 </div></div>
 <aside class="notes">
-<p>ABSCHLUSS (9:30–10:00), 2 Klicks. Die zwei Ideen in einem Satz: «Wir behalten die Struktur des Modells, tauschen die Verteilung aus [Klick] und transformieren den Parameter so, dass der lineare Teil passt.» [Klick] Ausblick: was β1 = 0.15 heisst (Odds-Verhältnis pro Sitzung), dann glm() in R.</p>
+<p>ABSCHLUSS (9:20–9:30), 1 Klick. Beide Merke-Punkte stehen sofort (v3: der Selbsttest hat sie gerade aufgelöst). Nur zeigen: «Das sind die zwei Sätze zum Mitnehmen.» [Klick] Ausblick: «Als Nächstes: was β1 = 0.15 heisst, Odds Ratios, dann glm() in R. Material und Daten unter dem Link.» Ohne Selbsttest (Notbremse, G 11 Enter): die zwei Sätze selbst sagen (30 s): «Wir behalten die Struktur des Modells, tauschen die Verteilung aus und transformieren den Parameter so, dass der lineare Teil passt.» Dann derselbe eine Klick: Ausblick.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;

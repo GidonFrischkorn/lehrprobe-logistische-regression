@@ -45,7 +45,8 @@ Schätzung realer Remissionsraten.
 | Idee 2 | Wertebereiche von Wahrscheinlichkeit, Odds, Log-Odds | Denkpause: $\pi = .8$, Odds? |
 | Modell | Logit-Gleichung, Rücktransformation, S-Kurve | |
 | Slider | Was passiert, wenn sich $\beta_1$ verdoppelt? | Vorhersage mit Nachbar:in, dann prüfen |
-| Mitnehmen | Die zwei Ideen in einem Satz, Ausblick auf `glm()` | |
+| Selbsttest | Vier Aussagen, richtig oder falsch (K-Prim) | Abstimmung (KlickerUZH oder Handzeichen); die Auflösung ist die Zusammenfassung |
+| Mitnehmen | Die zwei Ideen, Ausblick auf `glm()` | |
 
 Die Folien bauen sich schrittweise auf. Im Browser öffnet die Taste `s` die
 Sprechernotizen mit dem Ablauf pro Folie. Der Slider auf der vorletzten Folie
@@ -59,6 +60,7 @@ laden MathJax aus dem Netz.
 | `slides.qmd` | Folien (Quarto reveal.js); führt beim Rendern alle Skripte aus |
 | `index.qmd` | Begleitseite mit Lernziel, Code und Daten |
 | `custom.scss` | Theme der Folien |
+| `title-slide.html` | Titelfolie (Quarto-Partial) mit dem KlickerUZH-QR, wenn `klicker-join-url` in `slides.qmd` gesetzt ist |
 | `R/01_simulate_data.R` | simuliert `data/remission.csv`, Parameter in `output/sim_params.csv` |
 | `R/02_compute_numbers.R` | alle Zahlen der Folien (lineares Wahrscheinlichkeitsmodell, Transformationstabelle, `glm()`), inkl. Kontrolle der Transformationsformeln mit `stopifnot()` |
 | `R/03_figures.R` | alle Abbildungen in `figures/`, inkl. der Aufbauschritte und der Offline-Fallbacks für den Slider |
@@ -84,7 +86,9 @@ beim Rendern ausführt. Die Website wird nach `docs/` geschrieben
 
 Getestet mit R 4.6.1, ggplot2 4.0.3, patchwork 1.3.2, jsonlite 2.0.0,
 knitr 1.52, qrcode 0.3.0 und Quarto 1.10.18. Ohne das Paket `qrcode` wird
-die letzte Folie ohne QR-Code gerendert.
+die letzte Folie ohne QR-Code gerendert. Der KlickerUZH-QR auf Titelfolie, Folie 3
+und Folie 10 entsteht aus dem YAML-Feld `klicker-join-url` in `slides.qmd`; ist es
+leer, zeigen die Folien einen Platzhalter.
 
 ## Selbst ausprobieren
 

@@ -164,3 +164,39 @@ table.leiter img.zahlenstrahl {
 .reveal .modell-links p {
   margin: 0.3em 0;
 }
+
+// v3: KlickerUZH-Beitritt (QR + Link) auf Titelfolie, Folie 3 und Selbsttest
+.reveal .join-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2em;
+  font-size: 0.5em;
+  color: #5a6470;
+  text-align: center;
+  line-height: 1.25;
+  margin-top: 0.4em;
+}
+.reveal .join-box img {
+  margin: 0;
+  image-rendering: pixelated;   // scharfe QR-Module bei jeder Skalierung
+}
+.reveal .join-box.join-missing {
+  border: 2px dashed #D55E00;
+  color: #D55E00;
+  padding: 0.5em;
+  font-size: 0.6em;
+}
+.reveal .join-title {
+  margin: 0.8em auto 0;
+}
+// Folie 10: Selbsttest, vier Aussagen wie in KlickerUZH
+.reveal .selbsttest .klicker {
+  font-size: 0.95em;
+}
+.reveal .selbsttest .klicker p {
+  margin: 0.45em 0;
+}
+.reveal .selbsttest h2 {
+  font-size: 1.25em;
+}

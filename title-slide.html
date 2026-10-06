@@ -1,0 +1,21 @@
+<section id="$idprefix$title-slide"$for(title-slide-attributes/pairs)$ $it.key$="$it.value$"$endfor$>
+  <h1 class="title">$title$</h1>
+$if(subtitle)$
+  <p class="subtitle">$subtitle$</p>
+$endif$
+$for(author)$
+  <p class="author">$author$</p>
+$endfor$
+$for(institute)$
+  <p class="institute">$institute$</p>
+$endfor$
+$if(date)$
+  <p class="date">$date$</p>
+$endif$
+$if(klicker-join-url)$
+  <div class="join-box join-title">
+    <img src="figures/klicker_qr.png" width="150" height="150" alt="QR-Code: KlickerUZH beitreten, $klicker-join-url$">
+    <span>KlickerUZH: jetzt beitreten<br>$klicker-join-url$</span>
+  </div>
+$endif$
+</section>
