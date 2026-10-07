@@ -150,11 +150,23 @@ curve_df <- function(b0, b1, label) {
 lab_ref <- sprintf("β₀ = %s, β₁ = %s", beta0, beta1)
 lab_dbl <- sprintf("β₀ = %s, β₁ = %s", beta0, 2 * beta1)
 
+# Folie 8 baut in zwei Ebenen auf: erst nur die Kurve, am Ende des Rechenbeispiels
+# der Punkt pi = .5 bei x = -beta0/beta1 (Log-Odds 0, Odds 1) mit den gestrichelten
+# Linien, in Grün wie der Marker im Slider auf Folie 9.
+x_mid <- -beta0 / beta1
 p_s <- base_scatter +
   geom_line(data = curve_df(beta0, beta1, lab_ref),
             aes(x, pi), colour = col_logit, linewidth = 1.6) +
   coord_cartesian(ylim = c(-0.15, 1.2), xlim = c(0, 41))
-save_fig(p_s, "fig4_s_kurve.png")
+save_fig(p_s, "fig4_1_s_kurve.png")
+
+p_s_punkt <- p_s +
+  annotate("segment", x = x_mid, xend = x_mid, y = -0.15, yend = 0.5,
+           colour = col_alt, linetype = "dashed", linewidth = 0.8) +
+  annotate("segment", x = 0, xend = x_mid, y = 0.5, yend = 0.5,
+           colour = col_alt, linetype = "dashed", linewidth = 0.8) +
+  annotate("point", x = x_mid, y = 0.5, colour = col_alt, size = 4.5)
+save_fig(p_s_punkt, "fig4_2_s_kurve_punkt.png")
 
 p_s2 <- base_scatter +
   geom_line(data = rbind(curve_df(beta0, beta1, lab_ref),

@@ -66,6 +66,15 @@ pi_check   <- kn$value[kn$quantity == "pi_check"]
 odds_check <- kn$value[kn$quantity == "odds_check"]
 fmt_pi <- function(x) sub("^0", "", formatC(x, format = "f", digits = 2))
 
+# Zahlenbeispiel auf Folie 8: Rückweg Log-Odds -> Odds -> pi am Punkt pi = .5.
+# round(), weil beta0 + beta1 * x_mid in Gleitkommazahlen ~4e-16 ist, nicht 0,
+# und f2() daraus sonst «−0.00» macht. fnum lässt Nachkommastellen bei ganzen
+# Zahlen weg, fpi schreibt Wahrscheinlichkeiten ohne führende 0 (wie Folie 7).
+lo_mid   <- round(beta0 + beta1 * x_mid, 8)
+odds_mid <- round(exp(lo_mid), 8)
+fnum <- function(x) sub("^-", "−", formatC(round(x, 2), format = "fg"))
+fpi  <- function(x) sub("^0", "", formatC(round(x, 2), format = "fg"))
+
 # KlickerUZH-Beitritt: ein QR aus dem Link in der YAML (klicker-join-url).
 # Ohne Link zeigen die Folien einen sichtbaren Platzhalter statt eines QR.
 klicker_join_url <- rmarkdown::metadata[["klicker-join-url"]]
@@ -120,6 +129,8 @@ Remission ja (1) oder nein (0), je nach Anzahl Therapiesitzungen (`r x_lo` bis `
 :::
 
 ::: {.notes}
+Zeitmarken: Soll v4, ungemessen. Folie 3 steht jetzt in der Kette; Summe 9:30
+plus 10 s Reserve. Nach Probelauf 2 mit Stoppuhr neu setzen.
 EINORDNUNG (0:00–0:30), 3 Klicks. Wörtlich etwa:
 «In der letzten Sitzung haben wir die lineare Regression als statistisches Modell
 kennengelernt: eine Normalverteilung, deren Mittelwert von x abhängt.»
@@ -160,14 +171,15 @@ Die Symptome gehen schrittweise zurück, die Diagnose kennt nur ja oder nein. De
 [Fotos: Pixabay «Free-photos», Jesse Uli (Unsplash); CC0, via Wikimedia Commons]{.bildnachweis}
 
 ::: {.notes}
-BEISPIEL (neu, ca. 40 s), 2 Klicks. Start: Kriterium und linke Person.
+BEISPIEL (0:30–1:05), 2 Klicks. Start: Kriterium und linke Person.
 «Remission heisst: Die Symptome sind so weit zurückgegangen, dass die Diagnosekriterien
 nicht mehr erfüllt sind. Und eine Diagnose ist ein Ja/Nein-Urteil: Bei einer Depression
 braucht es mindestens fünf von neun Symptomen über zwei Wochen.»
 Links: «Nach der Therapie noch sechs Symptome: Diagnose bleibt, keine Remission, 0.»
 [Klick] Rechts: «Nur noch drei Symptome: Kriterien nicht mehr erfüllt, Remission, 1.»
 [Klick] Merke: «Die Symptome nehmen schrittweise ab, aber die Schwelle macht daraus
-ja oder nein. Deshalb ist unsere abhängige Variable binär.»
+ja oder nein. Deshalb ist unsere abhängige Variable binär.» Nachsatz, als Aufzählung:
+«Rückfall ja/nein, Studienabbruch, Aufgabe gelöst: dieselbe Situation.»
 Falls jemand fragt: In Therapiestudien wird Remission oft auch über einen Grenzwert auf
 einem Fragebogen bestimmt; das ist dieselbe Logik, eine Schwelle macht aus einem
 kontinuierlichen Wert ein Ja/Nein.
@@ -183,9 +195,9 @@ kontinuierlichen Wert ein Ja/Nein.
 ::: {.klicker}
 **KlickerUZH:** Was passiert, wenn wir eine lineare Regression mit einer binären abhängigen Variable rechnen?
 
-A. Das ist kein Problem, die Regressionsgerade beschreibt die Daten akzeptabel.
+A. Kein Problem: Die Gerade sagt für alle Sitzungszahlen Werte zwischen 0 und 1 vorher.
 
-B. Für manche Personen sagt die Gerade Werte unter 0 oder über 1 vorher. Das ist nicht ideal.
+B. Für manche Sitzungszahlen sagt die Gerade Werte unter 0 oder über 1 vorher.
 
 C. Eine solche Analyse kann man nicht rechnen, R bricht mit einer Fehlermeldung ab.
 :::
@@ -198,16 +210,18 @@ join_box(130)
 ::::
 
 ::: {.notes}
-KLICKER (0:30–1:35), keine Klicks: alle Optionen stehen von Anfang an. Block 1 in
+KLICKER (1:05–2:05), keine Klicks: alle Optionen stehen von Anfang an. Block 1 in
 KlickerUZH (Single Choice A/B/C, Countdown 35 s). Der QR stand schon auf der Titelfolie.
 [Klicker] Block 1 öffnen (Cockpit auf dem Handy), dabei sagen: «Schätzen Sie, ohne zu
 rechnen, 30 Sekunden. Wer noch nicht drin ist: QR rechts.» Dann, während sie tippen:
 «Unter der Frage sehen Sie zwei Regler, Tempo und Schwierigkeit. Verschieben Sie die,
 wann immer Sie wollen, ich schaue nachher drauf.» (Live Feedback, Option b.)
 Block schliesst sich nach 35 s selbst; Balken auf dem Handy-Cockpit ablesen, NICHT
-auflösen: «Interessant, Sie sind sich nicht einig. Schauen wir nach.»
+auflösen. Standard (die meisten B): «Fast alle sagen B. Schauen wir, wie schlimm es
+ist.» Bei gespaltenem Ergebnis: «Interessant, Sie sind sich nicht einig. Schauen wir nach.»
 Fallback ohne Netz / KlickerUZH: Handzeichen A/B/C (je Option kurz zählen lassen).
-Erwartung: viele A oder C. C ist falsch: R rechnet lm() mit 0/1 klaglos.
+A ist prüfbar falsch (Folie 5 zeigt Werte ausserhalb 0–1), C ist falsch: R rechnet
+lm() mit 0/1 klaglos.
 :::
 
 ## Was passiert mit der Geraden? {.nostretch}
@@ -248,7 +262,7 @@ Vorhersage bei `r x_hi` Sitzungen: **`r f2(pred_hi)`**, also eine «Wahrscheinli
 :::
 
 ::: {.notes}
-AUFLÖSUNG (1:35–2:35), 4 Klicks. Start: nur die Punkte. «Schauen wir nach.»
+AUFLÖSUNG (2:05–3:00), 4 Klicks. Start: nur die Punkte. «Schauen wir nach.»
 [Klick] Gerade + lm()-Befehl rechts. Antwort B. «Das ist der Befehl aus der letzten
 Sitzung. R rechnet das klaglos, keine Warnung, keine Fehlermeldung» (gegen C).
 [Klick] Schattierte Bereiche: «Wahrscheinlichkeiten gibt es nur zwischen 0 und 1.»
@@ -295,18 +309,21 @@ Gleiche Struktur: eine **Verteilung** und ein **Parameter, der von $x$ abhängt*
 :::
 
 ::: {.notes}
-IDEE 1 (2:35–4:20), 4 Klicks. Start: nur links. (v3: −15 s; ℬ(n, π) nur als «aus Statistik I» nennen, das Rate-Beispiel mit 20 Fragen weglassen.)
+IDEE 1 (3:00–4:30), 4 Klicks. Start: nur links.
 Links: Was sie kennen. Jede Person hat ihre eigene Normalverteilung; der Mittelwert
 mu_i liegt auf der Geraden.
-[Klick] Rechts Formel: Binäre AV braucht eine andere Verteilung. «Erinnern Sie sich an die
-Binomialverteilung aus Statistik I: X ~ B(n, pi), Anzahl richtige Antworten, wenn man
-bei 20 Single-Choice-Fragen rät. Hier ziehen wir pro Person genau einmal: n = 1.»
-(B(1, pi) heisst auch Bernoulli-Verteilung.)
+[Klick] Rechts Formel. Der Grund, nicht nur die Behauptung: «Eine Normalverteilung
+verteilt Wahrscheinlichkeit auf alle Werte, auch auf 0.3 oder 1.4. Y kennt nur 0 und 1.
+Die Binomialverteilung aus Statistik I, B(n, pi), ist genau die Verteilung einer
+0/1-Variable; hier ziehen wir pro Person genau einmal: n = 1. Nichts anderes passt zu
+dieser abhängigen Variable.» (B(1, pi) heisst auch Bernoulli-Verteilung. Kein
+Rate-Beispiel mit 20 Fragen, v3.)
 [Klick] Balken: bei 5 Sitzungen meist 0, bei 35 meist 1.
 [Klick] Kreise: Die Kreise sind pi_i, der Mittelwert der 0/1-Variable.
 Frage an den Raum: «Was liegt nahe für pi_i?» → «Die Gerade wie links!»
 [Klick] Merke-Box: gleiche Struktur.
-Genau das hat die lineare Regression gemacht, und das ging schief. Warum?
+«Die Gerade auf Folie 5 hat genau das getan: pi_i direkt auf die Gerade gesetzt. Und
+das ging schief. Warum? Nächste Folie.»
 Falls jemand nach sigma^2 fragt: Bei B(1, pi) ist die Varianz pi(1 − pi). Sie hängt
 an pi, deshalb braucht es keinen eigenen Streuungsparameter.
 :::
@@ -323,7 +340,7 @@ $\pi_i$ liegt zwischen 0 und 1, aber $\beta_0 + \beta_1 x_i$ kann jeden Wert ann
 </table>
 ```
 
-[$\pi$: Wahrscheinlichkeit einer Remission · Odds: Wahrscheinlichkeit dafür geteilt durch dagegen · $\ln$: natürlicher Logarithmus · $\infty$: unendlich · Farbe: dasselbe $\pi$]{.lesehilfe}
+[$\pi$: Wahrscheinlichkeit einer Remission · Odds: Wahrscheinlichkeit dafür geteilt durch dagegen · Farbe: dasselbe $\pi$]{.lesehilfe}
 
 ::: {.fragment .denkpause}
 **Denkpause:** Wenn $\pi = .8$, wie gross sind die Odds?
@@ -334,12 +351,18 @@ $.8 / .2 = `r odds_80`$: Auf `r odds_80` Remissionen kommt eine Nicht-Remission.
 :::
 
 ::: {.notes}
-IDEE 2 (4:20–6:10), 5 Klicks (die Zahlenstrahlen kommen mit ihrer Zeile). v3: −10 s; die Frage «kleinster, grösster Wert?» nur bei Odds und Log-Odds (der Bereich von π ist die Prämisse), Denkpause 15 s.
-[Klick] Wahrscheinlichkeit, [Klick] Odds, [Klick] Log-Odds; jeweils «Was ist der
-kleinste, was der grösste Wert?» Auf den Zahlenstrahl zeigen: der Bereich wächst.
+IDEE 2 (4:30–6:10), 5 Klicks (die Zahlenstrahlen kommen mit ihrer Zeile). Die Frage
+«kleinster, grösster Wert?» nur bei Log-Odds (der Bereich von π ist die Prämisse, Odds
+nur zeigen), Denkpause 15 s.
+[Klick] Wahrscheinlichkeit, [Klick] Odds, [Klick] Log-Odds: «Was ist der kleinste, was
+der grösste Wert?» Auf den Zahlenstrahl zeigen: der Bereich wächst.
 Farben mitverfolgen: «Orange ist π = 0: Odds 0, Log-Odds minus unendlich. Grün ist
 π = .5: Odds 1, Log-Odds 0. Lila ist π = 1: unendlich.» (π = .8 bewusst nicht
 markiert, das ist die Denkpause.)
+DARUM-SATZ, vor der Denkpause (das ist die Begründung, nicht Konvention): «Das ist der
+Umweg: Log-Odds decken den ganzen Zahlenstrahl ab, genau wie β0 + β1 x. Nur die darf
+man gleichsetzen. Andere Umrechnungen mit dieser Eigenschaft gäbe es; wir nehmen die
+Odds, weil Sie sie kennen und weil β1 nächste Sitzung ein Odds Ratio wird.»
 [Klick] DENKPAUSE, 15 Sekunden, Antwort aus dem Raum holen (4). [Klick] Auflösung.
 Symmetrie mündlich: «.2 und .8 liegen symmetrisch um 0.»
 Anknüpfen an Statistik I: odds_prior <- 0.8/0.2, und zurück mit odds/(1 + odds).
@@ -358,17 +381,18 @@ $$Y_i \sim \mathcal{B}(1,\ \pi_i)$$
 $$\pi_i = \ ?$$
 :::
 ::: {.fragment fragment-index=1}
-$$\ln\!\left(\frac{\pi_i}{1-\pi_i}\right) = \beta_0 + \beta_1 x_i$$
+$$
+\underbrace{\ln\!\left(\frac{\pi_i}{1-\pi_i}\right)}_{\text{Logit} \,=\, \text{Log-Odds von } \pi_i}
+= \underbrace{\beta_0 + \beta_1 x_i}_{\text{die lineare Gleichung}}
+$$
 :::
 :::
 
 ::: {.fragment fragment-index=2}
-Zurück zur Wahrscheinlichkeit, wie im Bayes-Beispiel:
+Zurück zur Wahrscheinlichkeit:
 
 ::: {.fragment .highlight-current-blue fragment-index=2}
 $$\text{Odds}_i = e^{\text{Log-Odds}_i} = e^{\beta_0 + \beta_1 x_i}$$
-
-[$e \approx 2.718$ (Eulersche Zahl); «$e$ hoch …» macht den Logarithmus $\ln$ rückgängig.]{.lesehilfe}
 :::
 :::
 
@@ -383,24 +407,46 @@ $$
 :::
 ::: {.column width="52%"}
 ::: {.fragment fragment-index=4}
-![](figures/fig4_s_kurve.png){fig-alt="Dieselben Daten mit einer S-förmigen Kurve, die von nahe 0 bei wenigen Sitzungen auf nahe 1 bei vielen Sitzungen ansteigt und den Bereich 0 bis 1 nie verlässt."}
+[Logistische (sigmoide) Funktion]{.fig-titel}
 
-[Kurve mit Achsenabschnitt $\beta_0 = `r beta0`$ und Steigung $\beta_1 = `r beta1`$]{.small-note}
+::: {.r-stack .s-kurve}
+![](figures/fig4_1_s_kurve.png){fig-alt="Dieselben Daten mit einer S-förmigen Kurve, die von nahe 0 bei wenigen Sitzungen auf nahe 1 bei vielen Sitzungen ansteigt und den Bereich 0 bis 1 nie verlässt."}
+
+::: {.fragment fragment-index=7}
+![](figures/fig4_2_s_kurve_punkt.png){fig-alt="Dieselbe S-Kurve, zusätzlich mit gestrichelten Linien bei 20 Sitzungen und π = .5 und einem Punkt im Schnittpunkt."}
+:::
+:::
+
+::: {.rechenbeispiel}
+**Beispiel (schrittweise):** $\beta_0 = `r beta0`$, $\beta_1 = `r beta1`$
+
+[Vorhersage bei $x = `r x_mid`$ Sitzungen: $`r beta0` + `r beta1` \cdot `r x_mid` = `r lo_mid`$]{.fragment fragment-index=5}
+
+[Odds: $e^{`r lo_mid`} = `r odds_mid`$]{.fragment fragment-index=6}[&nbsp;&rarr;&nbsp;Wahrscheinlichkeit $\pi = `r odds_mid` / (1 + `r odds_mid`) = `r fpi(plogis(lo_mid))`$]{.fragment fragment-index=7}
+:::
 :::
 :::
 ::::
 
 ::: {.notes}
-(6:10–7:10), 4 Klicks. Start: «pi_i = ?» wie auf Folie 6.
+MODELL (6:10–7:20), 7 Klicks. Start: «pi_i = ?» wie auf Folie 6.
 [Klick] Logit-Gleichung ersetzt das Fragezeichen. Der lineare Teil bleibt: links steht
-jetzt logit(pi_i) statt mu_i.
-[Klick] Zurückrechnen, erster Schritt (blau): e hoch Log-Odds gibt die Odds.
-[Klick] Zweiter Schritt (blau): Odds/(1 + Odds) gibt die Wahrscheinlichkeit.
-Dieselbe Formel wie im Bayes-Beispiel.
-[Klick] Ergebnis: Die S-Kurve. Sie bleibt zwischen 0 und 1, egal wie viele Sitzungen.
+jetzt logit(pi_i) statt mu_i. «Das Wort dafür steht auf der Folie: Logit.»
+[Klick] Erster Schritt (blau), ein Halbsatz: «e hoch macht ln rückgängig: aus Log-Odds
+werden Odds.»
+[Klick] Zweiter Schritt (blau), ein Halbsatz: «Odds durch 1 plus Odds: die
+Wahrscheinlichkeit, wie im Bayes-Beispiel.»
+[Klick] Kurve rechts (noch ohne Punkt) und die beta-Werte des Rechenbeispiels: «Die
+S-Kurve bleibt zwischen 0 und 1, egal wie viele Sitzungen. Sie heisst logistische
+Funktion, daher der Name der Methode. Rechnen wir eine Stelle durch.»
+[Klick] Vorhersage: «Minus 3 plus 0.15 mal 20 ist 0. Das sind die Log-Odds.»
+[Klick] Odds: «e hoch 0 ist 1.»
+[Klick] Wahrscheinlichkeit und gleichzeitig der grüne Punkt in der Kurve: «1 durch 2
+ist .5 — hier, bei `r x_mid` Sitzungen.» (Das grüne Trio von Folie 7 kommt auf Folie 9
+als Slider-Marker wieder.)
 :::
 
-## Schneller wirkende Therapie: $\beta_1$ verdoppelt sich {.nostretch}
+## Gedankenexperiment: schneller wirkende Therapie {.nostretch}
 
 ```{r slider-data}
 #| results: asis
@@ -547,26 +593,25 @@ cat("<script>window.remissionData = ",
 ```
 
 ::: {.notes}
-DENKPAUSE + SLIDER (7:10–7:55), kein Folienklick.
+DENKPAUSE + SLIDER (7:20–8:00), kein Folienklick.
 Vorher, noch auf Folie 8: [Cockpit] Blick aufs Handy (Live Feedback): «Kurzer
 Blick auf Ihre Regler: Tempo … , Schwierigkeit … .» Bei «zu schnell»: Denkpause hier
-20 s statt 15 s. Bei weniger als ~5 Eingaben: nichts sagen.
-Erst fragen, dann schieben: «β1 von 0.15 auf 0.30. Wird die Kurve steiler, flacher,
-oder verschiebt sie sich? Und ab wie vielen Sitzungen ist Remission so wahrscheinlich
-wie keine? Kurz mit Ihrem Nebenan besprechen.» (15 s)
+15 s statt 10 s. Bei weniger als ~5 Eingaben: nichts sagen.
+Der Titel sagt schon, dass es ein Gedankenexperiment ist und die Kurve steiler wird.
+Nur eine Frage, dann schieben: «β1 von 0.15 auf 0.30. Bei der alten Kurve ist π = .5
+bei `r x_mid` Sitzungen. Bei doppeltem β1: bei wie vielen? Kurz mit Ihrem Nebenan.» (10 s)
 Dann «Animieren» klicken (Maus, kein Folienklick): β1 läuft in 1.5 s von 0.15 auf
-0.30. Auflösung: steiler UND der Punkt mit π = .5 wandert von
-x = `r x_mid` nach x = `r x_mid2` (weil π = .5 bei x = −β0/β1). Klinisch: «Mit der
-schneller wirkenden Therapie ist Remission schon nach `r x_mid2` statt nach `r x_mid`
-Sitzungen so wahrscheinlich wie keine.»
-Falls jemand fragt, ob mehr Sitzungen die Remission verursachen: «Das sagen diese
-Daten nicht. Es sind Beobachtungsdaten; wer schwerer belastet ist, bekommt oft mehr
-Sitzungen. Dazu gibt es eine Übung auf der Materialseite.»
-Kein negatives β1 mehr (v3: die 15 s gehen in den Selbsttest). Falls jemand fragt:
-«Kurve fällt», einmal kurz schieben.
+0.30. Auflösung mit Kausal-Halbsatz, immer: «Steiler, und der Punkt π = .5 wandert von
+`r x_mid` auf `r x_mid2`, halbe Strecke, weil π = .5 bei x = −β0/β1. In diesen Daten
+ist Remission dann schon nach `r x_mid2` Sitzungen so wahrscheinlich wie keine. Die
+Steigung beschreibt den Zusammenhang in den Daten; ob die Sitzungen die Remission
+bewirken, sagt sie nicht.»
+Falls jemand nachfragt: «Es sind Beobachtungsdaten; wer schwerer belastet ist, bekommt
+oft mehr Sitzungen. Dazu gibt es eine Übung auf der Materialseite.»
+Kein negatives β1 (v3). Falls jemand fragt: «Kurve fällt», einmal kurz schieben.
 Fallback (kein Browser/JS): Backup-Folie am Ende (fig5).
-Entscheidung am Ende dieser Folie (Stoppuhr): bis 8:10 → Selbsttest voll; 8:10–8:35 →
-Selbsttest kurz (Block nach 25 s von Hand schliessen, zwei Sätze); nach 8:35 → kein
+Entscheidung am Ende dieser Folie (Stoppuhr): bis 8:15 → Selbsttest voll; 8:15–8:40 →
+Selbsttest kurz (Block nach 25 s von Hand schliessen, zwei Sätze); nach 8:40 → kein
 Selbsttest: G 11 Enter, Mitnehmen selbst sagen.
 :::
 
@@ -577,11 +622,11 @@ Selbsttest: G 11 Enter, Mitnehmen selbst sagen.
 ::: {.klicker}
 **KlickerUZH (K-Prim):** Welche der folgenden Aussagen über die logistische Regression treffen zu? Wählen Sie für jede Aussage aus, ob sie richtig oder falsch ist.
 
-A. $\mathcal{B}(1, \pi_i)$ gibt jeder Person ein eigenes $\pi_i$, so wie $\mathcal{N}(\mu_i, \sigma^2)$ jeder Person ein eigenes $\mu_i$ gibt.
+A. Im Modell haben zwei Personen mit gleich vielen Sitzungen dieselbe Wahrscheinlichkeit $\pi_i$, auch wenn eine remittiert und die andere nicht.
 
 B. In der logistischen Regression ist $\pi_i$ eine lineare Funktion der Anzahl Sitzungen $x_i$.
 
-C. Wenn $\pi = `r fmt_pi(pi_check)`$, betragen die Odds $`r odds_check`$.
+C. Wenn die Odds $`r odds_check`$ betragen, ist $\pi = `r fmt_pi(pi_check)`$.
 
 D. Log-Odds liegen wie Wahrscheinlichkeiten zwischen 0 und 1.
 :::
@@ -595,16 +640,17 @@ join_box(130, "40 Sekunden")
 ::::
 
 ::: {.notes}
-SELBSTTEST (7:55–9:20), keine Klicks. Block 2 in KlickerUZH (KPRIM, Countdown 40 s).
+SELBSTTEST (8:00–9:20), keine Klicks. Block 2 in KlickerUZH (KPRIM, Countdown 40 s).
 Die vier Sätze stehen hier wie in KlickerUZH, damit auch mitliest, wer nicht drin ist.
 [Klicker] Block 2 öffnen, dabei: «Zum Schluss prüfen Sie selbst: vier Aussagen,
 richtig oder falsch, 40 Sekunden.» Nicht kommentieren, warten.
 Block schliesst sich nach 40 s selbst (früher von Hand, wenn die Balken stehen).
 [Fenster] Ctrl+Tab zum KlickerUZH-Auswertungstab (Balkendiagramm, Lösung einblenden).
 Pro Aussage ein Satz, in dieser Reihenfolge (= Merke-Punkte):
-A richtig: «Gleiche Struktur, andere Verteilung: ein Parameter pro Person, der von x abhängt.»
+A richtig: «Ein Parameter pro Person, aber er hängt nur von x ab, wie mu_i in der
+linearen Regression. Verschieden ist nur noch der Ausgang Y.»
 B falsch: «Linear sind die Log-Odds. π folgt der S-Kurve und bleibt zwischen 0 und 1.»
-C richtig: «`r fmt_pi(pi_check)` durch `r fmt_pi(1 - pi_check)` ist `r odds_check`: drei Remissionen auf eine Nicht-Remission.»
+C richtig: «`r odds_check` durch 1 plus `r odds_check` ist `r fmt_pi(pi_check)`: drei Remissionen auf eine Nicht-Remission.»
 D falsch: «Log-Odds laufen von minus bis plus unendlich; unter π = .5 sind sie negativ.
 Genau deshalb darf hier eine Gerade stehen.»
 Bei einem Balken mit vielen Fehlern: diesen Satz zuerst, und er ist der erste Satz der Diskussion.
@@ -616,7 +662,7 @@ Fallback < 8 Teilnehmende: Block trotzdem öffnen, aber statt Balken zwei Person
 ## Mitnehmen
 
 ::: {.merke}
-1. Jedes statistische Modell ist eine **Verteilungsannahme**: Normalverteilung für stetige, Binomialverteilung $\mathcal{B}(1, \pi_i)$ für binäre abhängige Variablen.
+1. Jedes Regressionsmodell: eine **Verteilung** plus ein **Parameter, der von $x$ abhängt**. Normalverteilung mit $\mu_i$ für stetige, $\mathcal{B}(1, \pi_i)$ für binäre abhängige Variablen.
 2. Weil die Wahrscheinlichkeit $\pi_i$ zwischen 0 und 1 liegt, modellieren wir ihre **Log-Odds** als lineare Funktion von $x$ (Anzahl Sitzungen). So sagt das Modell nie eine unmögliche Remissionswahrscheinlichkeit vorher.
 :::
 
@@ -649,13 +695,14 @@ if (requireNamespace("qrcode", quietly = TRUE)) {
 ABSCHLUSS (9:20–9:30), 1 Klick. Beide Merke-Punkte stehen sofort (v3: der Selbsttest
 hat sie gerade aufgelöst). Nur zeigen: «Das sind die zwei Sätze zum Mitnehmen.»
 [Klick] Ausblick: «Als Nächstes: was β1 = 0.15 heisst, Odds Ratios, dann glm() in R.
-Material und Daten unter dem Link.»
+Material und Daten unter dem Link.» Nur bei Stoppuhr < 9:20 ein Halbsatz dazu: «g für
+generalisiert: dieselbe Struktur, andere Verteilung, andere Umrechnung.»
 Ohne Selbsttest (Notbremse, G 11 Enter): die zwei Sätze selbst sagen (30 s):
 «Wir behalten die Struktur des Modells, tauschen die Verteilung aus und transformieren
 den Parameter so, dass der lineare Teil passt.» Dann derselbe eine Klick: Ausblick.
 :::
 
-## Backup: schneller wirkende Therapie, β₁ verdoppelt {visibility="uncounted"}
+## Backup: Gedankenexperiment, β₁ verdoppelt {visibility="uncounted"}
 
 ![](figures/fig5_s_kurve_beta1_doppelt.png){fig-alt="Zwei S-Kurven: durchgezogen mit Beta1 gleich 0.15, gestrichelt mit Beta1 gleich 0.30. Die gestrichelte Kurve ist steiler und erreicht 0.5 schon bei 10 statt bei 20 Sitzungen." width="78%"}
 

@@ -153,6 +153,45 @@ table.leiter img.zahlenstrahl {
   margin: 0.3em 0;
 }
 
+// Folie 8 rechts: Titel über der Abbildung, darunter die Kurve in zwei Ebenen
+// (erst ohne, dann mit grünem Punkt) und das schrittweise Rechenbeispiel.
+// Grössere Schrift als die Lesehilfen: die Umformungen sollen im Saal lesbar sein.
+.reveal .fig-titel {
+  display: block;
+  text-align: center;
+  font-size: 0.7em;
+  font-weight: 600;
+  margin: 0 0 0.15em;
+}
+.reveal .r-stack.s-kurve {
+  margin: 0;
+}
+.reveal .r-stack.s-kurve > *,
+// auch der Absatz innerhalb des Fragment-Wrappers: dessen Rand hätte die zweite
+// Ebene sonst um ~12 px nach unten versetzt, die Kurve wäre beim Einblenden gesprungen
+.reveal .r-stack.s-kurve p {
+  width: 100%;
+  margin: 0;
+}
+// max-height: none, weil reveal.js den Bildern 95% gibt: beim ersten Bild bezieht
+// sich das auf die vom Grid gestreckte Zelle, beim zweiten nicht — die Ebenen wären
+// dann unterschiedlich hoch und die Kurve beim Einblenden gesprungen.
+.reveal .r-stack.s-kurve img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: none;
+  margin: 0;
+}
+.reveal .rechenbeispiel {
+  font-size: 0.72em;
+  line-height: 1.45;
+  text-align: center;
+}
+.reveal .rechenbeispiel p {
+  margin: 0.3em 0;
+}
+
 // v3: KlickerUZH-Beitritt (QR + Link) auf Titelfolie, Folie 4 und Selbsttest
 .reveal .join-box {
   display: flex;
@@ -192,7 +231,9 @@ table.leiter img.zahlenstrahl {
   font-size: 1.25em;
 }
 
-// Lesehilfe: jede Formel auch in Worten (Folien 6, 7, 9)
+// Lesehilfe: Notation in Worten (Folien 6 und 7). Sparsam halten: zu viel
+// Kleingedrucktes lenkt vom Vortrag ab; was aus der Matura bekannt ist (e, ln,
+// ∞), steht nicht auf der Folie.
 .reveal .lesehilfe {
   display: block;
   font-size: 0.55em;
