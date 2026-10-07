@@ -1,7 +1,8 @@
 Slides, texts and figures of this repository (slides.qmd, index.qmd,
-custom.scss, figures/) are licensed under the Creative Commons Attribution
-4.0 International License (CC BY 4.0). The R code (R/) is licensed under the
-MIT License, see LICENSE.
+r-code.qmd, custom.scss, figures/) are licensed under the Creative Commons
+Attribution 4.0 International License (CC BY 4.0). The R code (R/) is
+licensed under the MIT License, see LICENSE. The photos in images/ are
+CC0 1.0 (public domain), see images/QUELLEN.md.
 
 Attribution: Gidon T. Frischkorn (2026), Lehrprobe: Logistische Regression,
 https://github.com/GidonFrischkorn/lehrprobe-logistische-regression

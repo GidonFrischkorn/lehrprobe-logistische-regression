@@ -9,6 +9,16 @@ format:
     code-copy: true
 ---
 
+```{r setup}
+#| include: false
+sp    <- read.csv("output/sim_params.csv")
+b0    <- sp$value[sp$parameter == "beta0"]
+b1    <- sp$value[sp$parameter == "beta1"]
+tc    <- read.csv("output/true_curve.csv")
+x_mid <- tc$value[tc$quantity == "x_at_pi_50"]
+f2i   <- function(x) sub("^-", "−", format(x))
+```
+
 Diese Seite enthält alle Materialien zum zehnminütigen Vorlesungsausschnitt
 zur logistischen Regression: die Folien, die simulierten Daten und den
 vollständigen R-Code, mit dem alle Zahlen und Abbildungen der Folien erzeugt
@@ -16,29 +26,181 @@ werden.
 
 - **Folien:** [slides.html](slides.html) (im Browser; Taste `s` öffnet die Notizen)
 - **Daten:** [data/remission.csv](data/remission.csv)
+- **Explorer und Übungsfragen:** [die Parameter selbst ausprobieren](explorer.qmd)
+- **R-Code:** [Simulation und Analyse](r-code.qmd), mit Aufgaben zum Selbst-Ausprobieren
+
+## Wo steht der Ausschnitt in der Vorlesung?
+
+Der Ausschnitt ist als Teil einer Vorlesung **Statistik III** im
+Bachelorstudium Psychologie gedacht, nach einer Sitzung zur linearen
+Regression und vor der Interpretation der Koeffizienten. Er setzt voraus,
+was in Statistik I und II und in den ersten Sitzungen von Statistik III
+behandelt wurde:
+
+| Wann | Thema | Was der Ausschnitt davon braucht |
+|---|---|---|
+| Statistik I | Wahrscheinlichkeit, Zufallsvariablen und ihre Verteilungen | die Binomialverteilung: Anzahl Erfolge bei $n$ Versuchen mit Erfolgswahrscheinlichkeit $\pi$ |
+| Statistik I | Satz von Bayes | Odds (Chancen): Prior-Odds wie $.8/.2 = 4$ und zurück zur Wahrscheinlichkeit mit $\text{Odds}/(1 + \text{Odds})$ |
+| Statistik I und II | Normalverteilung, Mittelwert, Varianz, Stichprobe und Population | die Schreibweise $\mathcal{N}(\mu, \sigma^2)$ |
+| Statistik II | Inferenzstatistik: Hypothesentests, Konfidenzintervalle | die Idee, dass jedem Test ein statistisches Modell zugrunde liegt |
+| Statistik III, letzte Sitzung | einfache lineare Regression als statistisches Modell | $Y_i \sim \mathcal{N}(\mu_i, \sigma^2)$ mit $\mu_i = \beta_0 + \beta_1 x_i$ |
+| **Statistik III, heute** | **logistische Regression: Verteilung und Link-Funktion** | |
+| Statistik III, danach | Koeffizienten als Odds Ratios, Schätzung (Maximum Likelihood), `glm()` in R | |
+
+Mathematisch braucht der Ausschnitt nur Gymnasialstoff: Brüche, Potenzen und
+den natürlichen Logarithmus.
 
 ## Worum es geht
 
-Der Ausschnitt verfolgt zwei Ideen:
+Der Ausschnitt verfolgt zwei Ideen.
 
-1. **Jedes statistische Modell ist eine Verteilungsannahme.** Die lineare
-   Regression nimmt an, dass $Y_i \sim \mathcal{N}(\mu_i, \sigma^2)$ mit
-   $\mu_i = \beta_0 + \beta_1 x_i$. Eine binäre abhängige Variable braucht eine
-   andere Verteilung: $Y_i \sim \mathcal{B}(1, \pi_i)$. Die Struktur bleibt
-   gleich: eine Verteilung und ein Parameter, der von $x$ abhängt.
-2. **$\pi_i$ liegt zwischen 0 und 1, $\beta_0 + \beta_1 x_i$ nicht.** Deshalb
-   wird $\pi_i$ schrittweise transformiert: Wahrscheinlichkeit (0 bis 1) →
-   Odds $\pi/(1-\pi)$ (0 bis ∞) → Log-Odds (−∞ bis ∞). Das logistische
-   Regressionsmodell lautet
-   $\ln\!\left(\frac{\pi_i}{1-\pi_i}\right) = \beta_0 + \beta_1 x_i$.
+**1. Jedes statistische Modell ist eine Verteilungsannahme.** Die lineare
+Regression nimmt an, dass
+
+$$Y_i \sim \mathcal{N}(\mu_i, \sigma^2), \quad \mu_i = \beta_0 + \beta_1 x_i .$$
+
+In Worten: Der Wert $Y_i$ von Person $i$ stammt aus einer Normalverteilung
+($\mathcal{N}$). Deren Mittelwert $\mu_i$ liegt auf einer Geraden mit
+Achsenabschnitt $\beta_0$ und Steigung $\beta_1$; er hängt also davon ab,
+welchen Wert $x_i$ die Person auf der unabhängigen Variable hat. Die Streuung
+um diesen Mittelwert, die Varianz $\sigma^2$, ist für alle Personen gleich.
+
+Eine binäre abhängige Variable kennt nur 0 und 1 (hier: 1 = Remission,
+0 = keine Remission). Dafür passt die Normalverteilung nicht, wir brauchen
+die Binomialverteilung ($\mathcal{B}$):
+
+$$Y_i \sim \mathcal{B}(1, \pi_i) .$$
+
+In Worten: Für jede Person wird genau einmal «gezogen» (das ist die 1, also
+ein Versuch), und das Ergebnis ist mit der Wahrscheinlichkeit $\pi_i$ eine 1.
+$\pi_i$ (gelesen «pi i») ist also die Wahrscheinlichkeit, dass Person $i$
+remittiert. Mit der Kreiszahl $\pi \approx 3.14$ hat das nichts zu tun; $\pi$
+ist hier einfach der übliche Buchstabe für eine Wahrscheinlichkeit. Eine
+Binomialverteilung mit nur einem Versuch heisst auch Bernoulli-Verteilung.
+
+Die Struktur bleibt gleich: eine Verteilung und ein Parameter, der von $x$
+abhängt. In der linearen Regression ist dieser Parameter der Mittelwert
+$\mu_i$, in der logistischen Regression die Wahrscheinlichkeit $\pi_i$.
+
+**2. Eine Wahrscheinlichkeit liegt zwischen 0 und 1, eine Gerade nicht.**
+$\pi_i$ kann nur Werte von 0 bis 1 annehmen, der Ausdruck
+$\beta_0 + \beta_1 x_i$ aber jeden beliebigen Wert, auch negative oder
+solche über 1. Setzt man beide direkt gleich, sagt das Modell unmögliche
+Wahrscheinlichkeiten vorher. Deshalb wird $\pi_i$ in zwei Schritten so
+umgerechnet, dass der Wertebereich wächst:
+
+| Skala | Formel | in Worten | Wertebereich |
+|---|---|---|---|
+| Wahrscheinlichkeit | $\pi$ | Wie wahrscheinlich ist eine Remission? | 0 bis 1 |
+| Odds | $\dfrac{\pi}{1-\pi}$ | Wahrscheinlichkeit für eine Remission geteilt durch die Wahrscheinlichkeit dagegen | 0 bis unendlich ($\infty$) |
+| Log-Odds | $\ln\!\left(\dfrac{\pi}{1-\pi}\right)$ | natürlicher Logarithmus ($\ln$, Logarithmus zur Basis $e \approx 2.718$) der Odds | minus unendlich bis unendlich ($-\infty$ bis $\infty$) |
+
+Ein Beispiel: Bei $\pi = .8$ betragen die Odds $.8/.2 = 4$, eine Remission
+ist also viermal so wahrscheinlich wie keine: Auf vier Remissionen kommt eine
+Nicht-Remission. Die Log-Odds sind dann
+$\ln(4) \approx 1.39$. Bei $\pi = .5$ sind die Odds 1 und die Log-Odds 0;
+Wahrscheinlichkeiten unter .5 ergeben negative Log-Odds.
+
+Weil die Log-Odds jeden Wert annehmen können, dürfen sie auf einer Geraden
+liegen. Das logistische Regressionsmodell lautet deshalb
+
+$$\ln\!\left(\frac{\pi_i}{1-\pi_i}\right) = \beta_0 + \beta_1 x_i .$$
+
+In Worten: Die Log-Odds der Remission von Person $i$ hängen linear von der
+Anzahl Sitzungen $x_i$ ab. $\beta_0$ sind die Log-Odds bei 0 Sitzungen,
+$\beta_1$ ist die Zunahme der Log-Odds pro zusätzlicher Sitzung. Den Ausdruck
+links nennt man auch **Logit** von $\pi_i$. Allgemein heisst die
+Transformation, die $\pi_i$ mit dem linearen Teil $\beta_0 + \beta_1 x_i$
+verbindet, **Link-Funktion**; in der logistischen Regression ist das der
+Logit.
+
+Zurück zur Wahrscheinlichkeit kommt man in zwei Schritten, wie im
+Bayes-Beispiel aus Statistik I. Zuerst macht die Exponentialfunktion
+($e$ hoch …) den Logarithmus rückgängig und liefert die Odds:
+$\text{Odds}_i = e^{\beta_0 + \beta_1 x_i}$. Dann ergibt
+$\pi_i = \text{Odds}_i / (1 + \text{Odds}_i)$ die Wahrscheinlichkeit. Diese
+Wahrscheinlichkeit folgt einer S-förmigen Kurve über $x$ und bleibt immer
+zwischen 0 und 1.
+
+Was heisst das für das Beispiel? Mit $\beta_0 = `r f2i(b0)`$ und
+$\beta_1 = `r b1`$ ist eine Remission nach `r x_mid` Sitzungen so
+wahrscheinlich wie keine ($\pi = .5$): Von Patient:innen mit `r x_mid`
+Sitzungen remittiert etwa die Hälfte. Allgemein liegt diese Stelle bei
+$x = -\beta_0/\beta_1$, denn dort sind die Log-Odds 0.
+
+::: {.callout-note collapse="true"}
+## Vertiefung: Fragen, die Methodeninteressierte stellen
+
+**Warum gerade Log-Odds?** Jede Funktion, die Werte zwischen 0 und 1 auf
+den ganzen Zahlenstrahl abbildet, würde das Problem mit dem Wertebereich
+lösen. Die gängige Alternative ist das Probit-Modell, das statt der
+Log-Odds die Quantile der Standardnormalverteilung verwendet. Der Logit hat
+einen praktischen Vorteil: $\beta_1$ lässt sich über die Odds deuten
+(Odds Ratio, nächste Sitzung).
+
+**Wo ist die Varianz $\sigma^2$?** Die lineare Regression hat neben
+$\mu_i$ einen eigenen Streuungsparameter. Bei $\mathcal{B}(1, \pi_i)$ ist
+die Varianz $\pi_i(1 - \pi_i)$; sie folgt also aus $\pi_i$ und braucht
+keinen eigenen Parameter. Bei $\pi_i = .5$ ist sie am grössten.
+
+**Ist `lm()` mit einer 0/1-Variable immer falsch?** Nicht immer. In
+manchen Fächern wird dieses «lineare Wahrscheinlichkeitsmodell» bewusst
+verwendet, vor allem wenn die vorhergesagten Wahrscheinlichkeiten weit weg
+von 0 und 1 bleiben. Wo es an seine Grenzen kommt, zeigen Folie 4 und die
+erste Aufgabe auf der Seite [R-Code](r-code.qmd#selbst-ausprobieren).
+
+**Wie geht es weiter?** Dieselbe Struktur aus Verteilung, Link-Funktion
+und linearem Teil heisst **verallgemeinertes lineares Modell** (generalized
+linear model, GLM); daher auch der R-Befehl `glm()`. Für Zählvariablen,
+etwa die Anzahl Panikattacken pro Woche, nimmt man zum Beispiel eine
+Poisson-Verteilung und den Logarithmus als Link-Funktion.
+:::
+
+## Die Notation auf einen Blick
+
+| Zeichen | gelesen | Bedeutung im Beispiel |
+|---|---|---|
+| $i$ | «i» | Nummer der Person (1 bis 200); ein tiefgestelltes $i$ heisst «für Person $i$» |
+| $Y_i$ | «Y i» | abhängige Variable (AV) von Person $i$: Remission ja (1) oder nein (0) |
+| $x_i$ | «x i» | unabhängige Variable von Person $i$: Anzahl Therapiesitzungen |
+| $\sim$ | «ist verteilt wie» | Die Variable links folgt der Verteilung rechts. |
+| $\mathcal{N}(\mu, \sigma^2)$ | «Normalverteilung mit Mittelwert mü und Varianz Sigma-Quadrat» | Verteilungsannahme der linearen Regression |
+| $\mu_i$ | «mü i» | Mittelwert der Normalverteilung für Person $i$ |
+| $\sigma^2$ | «Sigma-Quadrat» | Varianz: wie stark die Werte um den Mittelwert streuen |
+| $\mathcal{B}(n, \pi)$ | «Binomialverteilung mit n Versuchen und Erfolgswahrscheinlichkeit pi» | Anzahl Erfolge bei $n$ Versuchen; mit $n = 1$ ist das Ergebnis 0 oder 1 |
+| $\pi_i$ | «pi i» | Wahrscheinlichkeit, dass Person $i$ remittiert ($Y_i = 1$); nicht die Kreiszahl 3.14 |
+| $\beta_0$ | «Beta null» | Achsenabschnitt: Wert des linearen Teils bei $x = 0$ |
+| $\beta_1$ | «Beta eins» | Steigung: Veränderung des linearen Teils pro zusätzlicher Sitzung |
+| $\dfrac{\pi}{1-\pi}$ | «Odds» | Wahrscheinlichkeit dafür geteilt durch Wahrscheinlichkeit dagegen |
+| $\ln$ | «natürlicher Logarithmus» | Logarithmus zur Basis $e$; macht aus Odds (0 bis $\infty$) Log-Odds ($-\infty$ bis $\infty$) |
+| $e$ | «e» | Eulersche Zahl, $e \approx 2.718$; $e^{a}$ macht $\ln$ rückgängig |
+| $\infty$ | «unendlich» | Es gibt keinen grössten (bei $-\infty$: keinen kleinsten) Wert. |
+| $.8$ | «null Komma acht» | In der Psychologie (APA-Stil) lässt man bei Wahrscheinlichkeiten die führende 0 weg. |
 
 ## Das Beispiel
 
 ```{r params}
 #| echo: false
 p <- read.csv("output/sim_params.csv")
-knitr::kable(p, col.names = c("Parameter", "Wert"))
+p$bedeutung <- c(
+  seed       = "Startwert des Zufallszahlengenerators (macht die Simulation wiederholbar)",
+  n_patients = "Anzahl Patient:innen",
+  x_min      = "kleinste Anzahl Sitzungen",
+  x_max      = "grösste Anzahl Sitzungen",
+  beta0      = "β₀: Log-Odds der Remission bei 0 Sitzungen",
+  beta1      = "β₁: Zunahme der Log-Odds pro zusätzlicher Sitzung"
+)[p$parameter]
+knitr::kable(p, col.names = c("Parameter", "Wert", "Bedeutung"))
 ```
+
+**Was heisst Remission?** Eine Diagnose ist ein Ja/Nein-Urteil: Die
+Diagnosekriterien sind erfüllt oder nicht. Für eine Depression verlangt das
+DSM-5 zum Beispiel mindestens 5 von 9 Symptomen über zwei Wochen, darunter
+gedrückte Stimmung oder Interessenverlust. Remission heisst, dass die
+Symptome so weit zurückgegangen sind, dass die Kriterien nicht mehr erfüllt
+sind. Die Symptome nehmen schrittweise ab, aber die Schwelle macht daraus ein
+Ja oder Nein. Deshalb ist Remission eine binäre Variable: 1 = Remission,
+0 = keine Remission.
 
 Die Daten sind **simuliert**. `r p$value[p$parameter == "n_patients"]`
 Patient:innen erhalten zwischen `r p$value[p$parameter == "x_min"]` und
@@ -46,44 +208,11 @@ Patient:innen erhalten zwischen `r p$value[p$parameter == "x_min"]` und
 einer Remission folgt dem logistischen Modell mit den Parametern oben. Die
 Zahlen illustrieren das Modell und sind keine Schätzung realer
 Remissionsraten. Ob mehr Sitzungen Remission *verursachen*, lässt sich mit
-solchen Beobachtungsdaten ohnehin nicht beantworten.
-
-## R-Code
-
-Die drei Skripte werden in dieser Reihenfolge aus dem Projektordner
-ausgeführt. Beim Rendern der Folien laufen sie automatisch.
-
-### 1. Daten simulieren
-
-```{r}
-#| eval: false
-#| file: R/01_simulate_data.R
-```
-
-### 2. Zahlen für die Folien berechnen
-
-```{r}
-#| eval: false
-#| file: R/02_compute_numbers.R
-```
-
-### 3. Abbildungen erstellen
-
-```{r}
-#| eval: false
-#| file: R/03_figures.R
-```
-
-## Selbst ausprobieren
-
-- Verändern Sie in `01_simulate_data.R` den Wert von `beta1`. Wie verändert sich
-  die Abbildung `fig2_lineare_regression.png`? Ab welchem Wert liegen keine
-  Vorhersagen der linearen Regression mehr ausserhalb von [0, 1]?
-- Berechnen Sie Odds und Log-Odds für $\pi = .1$ und $\pi = .9$. Was fällt auf?
-- Schätzen Sie das Modell mit
-  `glm(remission ~ sitzungen, family = binomial, data = remission_data)`.
-  Wie nahe liegen die Schätzungen an den wahren Werten $\beta_0 = -3$ und
-  $\beta_1 = 0.15$?
+solchen Beobachtungsdaten ohnehin nicht beantworten. In der Praxis bekommen
+zum Beispiel schwer belastete Patient:innen oft mehr Sitzungen und
+remittieren zugleich seltener; der Schweregrad hängt dann mit beiden
+Variablen zusammen. [Übung 7](explorer.qmd#übungsfragen) zeigt, wie
+das in den Daten aussehen kann.
 
 ## Lizenz
 

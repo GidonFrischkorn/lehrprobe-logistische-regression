@@ -1,0 +1,27 @@
+```{r, include = FALSE}
+fmt <- function(x, d) formatC(x, format = "f", digits = d)
+b0 <- -3; b1 <- 0.15; x <- 10
+lo <- b0 + b1 * x; od <- exp(lo); p <- od / (1 + od)
+```
+
+Question
+========
+Mit $\beta_0 = `r b0`$ und $\beta_1 = `r b1`$: Wie gross ist die Wahrscheinlichkeit einer Remission $\pi$ nach $x = `r x`$ Sitzungen?
+Geben Sie das Ergebnis auf zwei Nachkommastellen an, mit Punkt als Dezimalzeichen (z. B. 0.42).
+
+Solution
+========
+Drei Schritte, wie auf den Folien:
+
+1. Log-Odds: $\beta_0 + \beta_1 x = `r b0` + `r b1` \cdot `r x` = `r fmt(lo, 2)`$
+2. Odds: $e^{`r fmt(lo, 2)`} = `r fmt(od, 3)`$
+3. Wahrscheinlichkeit: $`r fmt(od, 3)` / (1 + `r fmt(od, 3)`) = `r fmt(p, 3)`$, gerundet $`r fmt(p, 2)`$.
+
+Nach `r x` Sitzungen remittieren also etwa `r round(100 * p)` von 100 Patient:innen. Im Explorer zeigt die Anzeige unter der Grafik diese drei Schritte, wenn Sie bei «Sitzungen» 10 einstellen.
+
+Meta-information
+================
+exname: pi_bei_10
+extype: num
+exsolution: `r round(p, 2)`
+extol: 0.01

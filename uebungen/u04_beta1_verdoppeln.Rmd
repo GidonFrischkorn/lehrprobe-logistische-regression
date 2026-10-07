@@ -1,0 +1,33 @@
+```{r, include = FALSE}
+fmt <- function(x, d) formatC(x, format = "f", digits = d)
+b0 <- -3; b1 <- 0.15
+p0 <- plogis(b0)
+```
+
+Question
+========
+Ausgangspunkt ist $\beta_0 = `r b0`$, $\beta_1 = `r b1`$. Eine zweite Therapieform wirkt schneller: Die Log-Odds der Remission steigen pro Sitzung doppelt so stark. Sie verdoppeln also die Steigung auf $\beta_1 = `r 2 * b1`$ und lassen $\beta_0$ gleich.
+Welche Aussagen sind richtig? Probieren Sie es im Explorer aus.
+
+Answerlist
+----------
+* Die Kurve wird steiler: $\pi$ steigt pro zusätzlicher Sitzung stärker an.
+* Die Stelle mit $\pi = .5$ wandert von `r -b0 / b1` auf `r -b0 / (2 * b1)` Sitzungen.
+* Die Wahrscheinlichkeit einer Remission bei 0 Sitzungen ändert sich.
+* Bei vielen Sitzungen sagt die Kurve jetzt Werte über 1 vorher.
+
+Solution
+========
+Answerlist
+----------
+* Richtig. $\beta_1$ bestimmt, wie stark die Log-Odds pro Sitzung zunehmen; doppelt so viel Zunahme macht die S-Kurve steiler.
+* Richtig. $\pi = .5$ liegt bei $x = -\beta_0/\beta_1 = `r -b0`/`r 2 * b1` = `r -b0 / (2 * b1)`$. Klinisch: Mit der schneller wirkenden Therapie ist Remission schon nach `r -b0 / (2 * b1)` statt nach `r -b0 / b1` Sitzungen so wahrscheinlich wie keine.
+* Falsch. Bei $x = 0$ fällt $\beta_1 x$ weg; die Log-Odds sind dort immer $\beta_0$, also $\pi = `r fmt(p0, 3)`$, egal wie gross $\beta_1$ ist.
+* Falsch. Die S-Kurve nähert sich 1 nur an. Genau dafür haben wir den Umweg über die Log-Odds gemacht.
+
+Meta-information
+================
+exname: beta1_verdoppeln
+extype: mchoice
+exsolution: 1100
+exshuffle: TRUE

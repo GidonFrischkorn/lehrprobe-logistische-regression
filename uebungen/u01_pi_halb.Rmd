@@ -1,0 +1,22 @@
+```{r, include = FALSE}
+b0 <- -3; b1 <- 0.15
+x_half <- -b0 / b1
+```
+
+Question
+========
+Stellen Sie im Explorer die Ausgangskurve ein: Achsenabschnitt $\beta_0 = `r b0`$, Steigung $\beta_1 = `r b1`$.
+Bei wie vielen Therapiesitzungen ist eine Remission genau so wahrscheinlich wie keine Remission, also $\pi = .5$? Klinisch gefragt: Nach wie vielen Sitzungen remittiert etwa die Hälfte der Patient:innen?
+
+Solution
+========
+Bei $\pi = .5$ sind die Odds $.5/.5 = 1$ und die Log-Odds $\ln(1) = 0$. Gesucht ist also das $x$, bei dem der lineare Teil null wird:
+$\beta_0 + \beta_1 x = 0$, also $x = -\beta_0/\beta_1 = `r -b0`/`r b1` = `r x_half`$ Sitzungen.
+Im Explorer markiert die gestrichelte Linie genau diese Stelle.
+
+Meta-information
+================
+exname: pi_halb
+extype: num
+exsolution: `r x_half`
+extol: 0.5

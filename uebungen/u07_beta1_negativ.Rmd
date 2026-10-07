@@ -1,0 +1,30 @@
+```{r, include = FALSE}
+b0 <- 3; b1 <- -0.15
+```
+
+Question
+========
+In einer anderen Klinik bekommen schwer belastete Patient:innen mehr Sitzungen als leicht belastete. Dort ergibt sich $\beta_0 = `r b0`$ und $\beta_1 = `r b1`$. Stellen Sie diese Werte im Explorer ein. Was bedeutet die negative Steigung?
+
+Answerlist
+----------
+* Mit jeder zusätzlichen Sitzung sinken die Log-Odds; die Kurve fällt von links oben nach rechts unten.
+* Negative Werte von $\beta_1$ sind nicht erlaubt, weil Wahrscheinlichkeiten nicht negativ sein können.
+* Die Wahrscheinlichkeit einer Remission ist bei allen Sitzungszahlen negativ.
+* Die Kurve steigt weiterhin, nur flacher.
+
+Solution
+========
+Answerlist
+----------
+* Richtig. $\beta_1$ ist die Veränderung der Log-Odds pro Sitzung; ist sie negativ, wird Remission mit mehr Sitzungen unwahrscheinlicher. $\pi = .5$ liegt hier bei $x = -\beta_0/\beta_1 = `r -b0 / b1`$. Das heisst nicht, dass Sitzungen schaden: Es sind Beobachtungsdaten, und der Schweregrad kann beides erklären, mehr Sitzungen und seltenere Remission.
+* Falsch. $\beta_1$ wirkt auf die Log-Odds, und die dürfen jeden Wert annehmen. $\pi$ bleibt trotzdem zwischen 0 und 1.
+* Falsch. $\pi$ liegt immer zwischen 0 und 1, auch bei negativem $\beta_1$.
+* Falsch. Das Vorzeichen bestimmt die Richtung; die Kurve fällt.
+
+Meta-information
+================
+exname: beta1_negativ
+extype: schoice
+exsolution: 1000
+exshuffle: TRUE

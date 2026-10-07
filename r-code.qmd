@@ -1,0 +1,71 @@
+---
+title: "R-Code: Simulation und Analyse"
+subtitle: "Wie die Daten, Zahlen und Abbildungen der Folien entstehen"
+lang: de
+format:
+  html:
+    toc: true
+    code-copy: true
+---
+
+```{r}
+#| include: false
+p <- read.csv("output/sim_params.csv")
+```
+
+Die Daten der Lehrprobe sind simuliert: Das erste Skript erzeugt
+`r p$value[p$parameter == "n_patients"]` Patient:innen aus dem logistischen Regressionsmodell mit bekannten
+Parametern. Das Modell und die Notation sind auf der
+[Materialseite](index.qmd) erklärt; die Daten liegen unter
+[data/remission.csv](data/remission.csv).
+
+Die drei Skripte werden in dieser Reihenfolge aus dem Projektordner
+ausgeführt. Beim Rendern der Folien laufen sie automatisch. In den
+Kommentaren steht `pi` für $\pi$, `beta0` und `beta1` für $\beta_0$ und
+$\beta_1$, `mu` und `sigma` für $\mu$ und $\sigma$. Zwei R-Funktionen
+kommen vor: `qlogis()` rechnet eine Wahrscheinlichkeit in Log-Odds um,
+`plogis()` Log-Odds zurück in eine Wahrscheinlichkeit.
+
+## 1. Daten simulieren
+
+```{r}
+#| eval: false
+#| file: R/01_simulate_data.R
+```
+
+## 2. Zahlen für die Folien berechnen
+
+```{r}
+#| eval: false
+#| file: R/02_compute_numbers.R
+```
+
+## 3. Abbildungen erstellen
+
+```{r}
+#| eval: false
+#| file: R/03_figures.R
+```
+
+## Selbst ausprobieren
+
+- Verändern Sie in `01_simulate_data.R` den Wert von `beta1`, der Steigung
+  $\beta_1$. Wie verändert sich die Abbildung `fig2_lineare_regression.png`?
+  Ab welchem Wert liegen keine Vorhersagen der linearen Regression mehr
+  ausserhalb des Bereichs von 0 bis 1?
+- Berechnen Sie Odds und Log-Odds für die Wahrscheinlichkeiten $\pi = .1$ und
+  $\pi = .9$. Was fällt auf?
+- Schätzen Sie das Modell mit
+  `glm(remission ~ sitzungen, family = binomial, data = remission_data)`.
+  `family = binomial` sagt R, dass die abhängige Variable einer
+  Binomialverteilung folgt. Wie nahe liegen die Schätzungen an den wahren
+  Werten $\beta_0 = `r sub("^-", "−", p$value[p$parameter == "beta0"])`$
+  und $\beta_1 = `r p$value[p$parameter == "beta1"]`$?
+- Wie stark hängen die Schätzungen von der Stichprobe ab? Kopieren Sie die
+  Simulation aus `01_simulate_data.R` in ein eigenes Skript (ohne die
+  `write.csv()`-Zeilen, damit die Daten der Folien unverändert bleiben).
+  Setzen Sie `n_patients <- 50` und wiederholen Sie Simulation und
+  `glm()`-Schätzung mit verschiedenen Werten in `set.seed()`. Wie stark
+  schwankt die Schätzung von $\beta_1$ um den wahren Wert? Was ändert sich
+  mit `n_patients <- 1000`?
+

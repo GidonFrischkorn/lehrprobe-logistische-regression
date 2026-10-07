@@ -8,8 +8,10 @@ lang: de
 # KlickerUZH-Beitrittslink: Konto-Link https://pwa.klicker.uzh.ch/join/{shortname}
 # (leitet auf das einzige laufende Live-Quiz weiter) oder der direkte Quiz-Link aus
 # der Aktivitätenliste. Leer lassen = Platzhalter statt QR auf den Folien.
+# Liegt figures/klickeruzh_qr.png vor (QR-Download aus KlickerUZH), wird dieser
+# statt eines erzeugten QR verwendet.
 # Nach dem Eintragen: quarto render, dann jeden QR scannen (teaching-demo/tools).
-klicker-join-url: ""
+klicker-join-url: "https://pwa.klicker.uzh.ch/de/session/0d4d13f4-e434-41d8-b857-917a802e1068"
 format:
   revealjs:
     theme: [default, custom.scss]
@@ -19,7 +21,7 @@ format:
     slide-number: c/t
     transition: fade
     transition-speed: fast
-    footer: "Lehrprobe · Logistische Regression · BSc Statistik"
+    footer: "Lehrprobe · Logistische Regression · BSc Psychologie, Statistik III"
     html-math-method: mathjax
     fig-align: center
     navigation-mode: linear
@@ -68,9 +70,13 @@ fmt_pi <- function(x) sub("^0", "", formatC(x, format = "f", digits = 2))
 # Ohne Link zeigen die Folien einen sichtbaren Platzhalter statt eines QR.
 klicker_join_url <- rmarkdown::metadata[["klicker-join-url"]]
 klicker_qr_file  <- "figures/klicker_qr.png"
-has_klicker <- !is.null(klicker_join_url) && nzchar(klicker_join_url) &&
-  requireNamespace("qrcode", quietly = TRUE)
-if (has_klicker) {
+klicker_qr_uzh   <- "figures/klickeruzh_qr.png"   # offizieller QR aus KlickerUZH
+has_url <- !is.null(klicker_join_url) && nzchar(klicker_join_url)
+has_klicker <- has_url &&
+  (file.exists(klicker_qr_uzh) || requireNamespace("qrcode", quietly = TRUE))
+if (has_klicker && file.exists(klicker_qr_uzh)) {
+  file.copy(klicker_qr_uzh, klicker_qr_file, overwrite = TRUE)
+} else if (has_klicker) {
   png(klicker_qr_file, width = 600, height = 600, bg = "white")
   par(mar = c(0, 0, 0, 0)); plot(qrcode::qr_code(klicker_join_url, ecl = "M"))
   dev.off()
@@ -81,9 +87,8 @@ join_box <- function(px, label = "KlickerUZH") {
   if (has_klicker) {
     cat(sprintf(paste0(
       '<div class="join-box"><img src="%s" width="%d" height="%d" ',
-      'alt="QR-Code: KlickerUZH beitreten, %s"><span>%s<br>%s</span></div>'),
-      klicker_qr_file, px, px, klicker_join_url, label,
-      sub("^https?://", "", klicker_join_url)))
+      'alt="QR-Code: KlickerUZH beitreten, %s"><span>%s</span></div>'),
+      klicker_qr_file, px, px, klicker_join_url, label))
   } else {
     cat(sprintf('<div class="join-box join-missing">%s: Link fehlt (klicker-join-url in slides.qmd)</div>', label))
   }
@@ -95,7 +100,7 @@ join_box <- function(px, label = "KlickerUZH") {
 ::: {.timeline}
 ::: {}
 [Bisher]{.label}
-Lineare Regression als statistisches Modell: Normalverteilung, deren Mittelwert von $x$ abhängt
+Statistik I: Binomialverteilung, Odds im Bayes-Beispiel. Letzte Sitzung: lineare Regression als Modell, eine Normalverteilung, deren Mittelwert von $x$ (z. B. Anzahl Sitzungen) abhängt
 :::
 ::: {.now .fragment fragment-index=2}
 [Jetzt]{.label}
@@ -122,10 +127,53 @@ kennengelernt: eine Normalverteilung, deren Mittelwert von x abhängt.»
 als Odds Ratios interpretiert und das Modell in R schätzt.»
 [Klick] Jetzt. «Und dazwischen: heute.» Frage vorlesen.
 [Klick] Beispiel einführen: Klinische Frage, die sie kennen: Hängt es mit der Anzahl
-Sitzungen zusammen, ob jemand remittiert? Remission ist ja/nein.
+Sitzungen zusammen, ob jemand remittiert? Was Remission heisst: nächste Folie.
 :::
 
-## Ihre Intuition ist gefragt
+## Das Beispiel: Was heisst Remission? {.remission}
+
+**Diagnose** (Beispiel Depression nach DSM-5): mindestens **5 von 9** Symptomen über zwei Wochen, darunter gedrückte Stimmung oder Interessenverlust. Die Kriterien sind **erfüllt oder nicht**.
+
+:::: {.columns}
+::: {.column width="50%"}
+![](images/niedergeschlagen.jpg){.foto fig-alt="Schwarzweissfoto: eine Frau von hinten, den Kopf gesenkt."}
+
+[●●●●[|]{.schwelle}●●○○○]{.symptome} 6 von 9 Symptomen: über der Schwelle
+
+Kriterien weiter erfüllt: **keine Remission**, $Y = 0$
+:::
+::: {.column width="50%"}
+::: {.fragment fragment-index=1}
+![](images/zufrieden.jpg){.foto fig-alt="Farbfoto: eine Frau von hinten, die mit erhobenen Armen in der Abendsonne durch ein Feld tanzt."}
+
+[●●●○[|]{.schwelle}○○○○○]{.symptome} 3 von 9 Symptomen: unter der Schwelle
+
+Kriterien nicht mehr erfüllt: **Remission**, $Y = 1$
+:::
+:::
+::::
+
+::: {.fragment .merke fragment-index=2}
+Die Symptome gehen schrittweise zurück, die Diagnose kennt nur ja oder nein. Deshalb ist auch **Remission binär**.
+:::
+
+[Fotos: Pixabay «Free-photos», Jesse Uli (Unsplash); CC0, via Wikimedia Commons]{.bildnachweis}
+
+::: {.notes}
+BEISPIEL (neu, ca. 40 s), 2 Klicks. Start: Kriterium und linke Person.
+«Remission heisst: Die Symptome sind so weit zurückgegangen, dass die Diagnosekriterien
+nicht mehr erfüllt sind. Und eine Diagnose ist ein Ja/Nein-Urteil: Bei einer Depression
+braucht es mindestens fünf von neun Symptomen über zwei Wochen.»
+Links: «Nach der Therapie noch sechs Symptome: Diagnose bleibt, keine Remission, 0.»
+[Klick] Rechts: «Nur noch drei Symptome: Kriterien nicht mehr erfüllt, Remission, 1.»
+[Klick] Merke: «Die Symptome nehmen schrittweise ab, aber die Schwelle macht daraus
+ja oder nein. Deshalb ist unsere abhängige Variable binär.»
+Falls jemand fragt: In Therapiestudien wird Remission oft auch über einen Grenzwert auf
+einem Fragebogen bestimmt; das ist dieselbe Logik, eine Schwelle macht aus einem
+kontinuierlichen Wert ein Ja/Nein.
+:::
+
+## Ihre Intuition ist gefragt {.intuition}
 
 :::: {.columns}
 ::: {.column width="62%"}
@@ -133,18 +181,18 @@ Sitzungen zusammen, ob jemand remittiert? Remission ist ja/nein.
 :::
 ::: {.column width="38%"}
 ::: {.klicker}
-**KlickerUZH:** Was passiert, wenn wir hier eine lineare Regression rechnen?
+**KlickerUZH:** Was passiert, wenn wir eine lineare Regression mit einer binären abhängigen Variable rechnen?
 
-A. Die Gerade beschreibt die Daten gut.
+A. Das ist kein Problem, die Regressionsgerade beschreibt die Daten akzeptabel.
 
-B. Für manche Personen sagt die Gerade Werte unter 0 oder über 1 vorher.
+B. Für manche Personen sagt die Gerade Werte unter 0 oder über 1 vorher. Das ist nicht ideal.
 
-C. R bricht mit einer Fehlermeldung ab, weil $Y$ nur 0 und 1 enthält.
+C. Eine solche Analyse kann man nicht rechnen, R bricht mit einer Fehlermeldung ab.
 :::
 
 ```{r join-slide3}
 #| results: asis
-join_box(150)
+join_box(130)
 ```
 :::
 ::::
@@ -164,6 +212,8 @@ Erwartung: viele A oder C. C ist falsch: R rechnet lm() mit 0/1 klaglos.
 
 ## Was passiert mit der Geraden? {.nostretch}
 
+:::: {.columns}
+::: {.column width="68%"}
 ::: {.r-stack .layers}
 ![](figures/fig2_0_punkte.png){fig-alt="Streudiagramm: Remission (0 = nein, 1 = ja) gegen Anzahl Therapiesitzungen von 1 bis 40, dieselben Daten wie auf der Klicker-Folie."}
 
@@ -173,24 +223,45 @@ Erwartung: viele A oder C. C ist falsch: R rechnet lm() mit 0/1 klaglos.
 
 ![](figures/fig2_3_vorhersagen.png){.fragment fragment-index=3 fig-alt="Wie zuvor, zusätzlich sind die Vorhersagen der Geraden bei 1 und bei 40 Sitzungen als Kreise markiert und beschriftet: `r f2(pred_lo)` und `r f2(pred_hi)`."}
 :::
+:::
+::: {.column .lm-code width="32%"}
+::: {.fragment fragment-index=1}
+Die Gerade in R:
+
+```{.r code-line-numbers="false"}
+lm(remission ~ sitzungen,
+   data = remission_data)
+```
+
+Keine Warnung, keine Fehlermeldung.
+:::
+
+::: {.fragment .merke fragment-index=4}
+R rechnet jedes Modell, das Sie angeben. **Welches Modell passt, entscheiden Sie.**
+:::
+:::
+::::
 
 ::: {.fragment fragment-index=3}
 Vorhersage bei `r x_hi` Sitzungen: **`r f2(pred_hi)`**, also eine «Wahrscheinlichkeit» von `r pct(pred_hi)`? Bei `r x_lo` Sitzung: **`r f2(pred_lo)`**.
-`r n_out` von `r n_total` vorhergesagten Werten liegen ausserhalb von [0, 1].
+`r n_out` von `r n_total` vorhergesagten Werten liegen ausserhalb von 0 bis 1.
 :::
 
 ::: {.notes}
-AUFLÖSUNG (1:35–2:35), 3 Klicks. Start: nur die Punkte. «Schauen wir nach.»
-[Klick] Gerade. Antwort B. «R rechnet das klaglos, keine Fehlermeldung» (gegen C).
+AUFLÖSUNG (1:35–2:35), 4 Klicks. Start: nur die Punkte. «Schauen wir nach.»
+[Klick] Gerade + lm()-Befehl rechts. Antwort B. «Das ist der Befehl aus der letzten
+Sitzung. R rechnet das klaglos, keine Warnung, keine Fehlermeldung» (gegen C).
 [Klick] Schattierte Bereiche: «Wahrscheinlichkeiten gibt es nur zwischen 0 und 1.»
 [Klick] Markierungen bei 1 und `r x_hi` Sitzungen + Textzeile: «Bei `r x_hi` Sitzungen
 sagt die Gerade `r f2(pred_hi)` vorher, eine Wahrscheinlichkeit von `r pct(pred_hi)`.»
 Kernsatz: «Die Gerade weiss nicht, dass es eine Wahrscheinlichkeit beschreiben soll.»
+[Klick] Merke rechts: «R prüft nicht, ob das Modell zu Ihrer abhängigen Variable passt.
+Diese Entscheidung nimmt Ihnen kein Programm ab, die treffen Sie.»
 Überleitung: «Das Problem liegt nicht in der Geraden, sondern im Modell dahinter.
 Dafür gehen wir einen Schritt zurück.»
 :::
 
-## Jeder Test beruht auf einem Modell {.nostretch}
+## Jede Regression beruht auf einer Verteilungsannahme {.nostretch}
 
 ::::: {.columns}
 :::: {.column width="50%"}
@@ -198,19 +269,23 @@ Dafür gehen wir einen Schritt zurück.»
 
 $$Y_i \sim \mathcal{N}(\mu_i,\ \sigma^2), \quad \mu_i = \beta_0 + \beta_1 x_i$$
 
-![](figures/fig3a_normal.png){fig-alt="Regressionsgerade für einen Symptomwert mit Normalverteilungen um den Mittelwert bei 5, 20 und 35 Sitzungen." width="74%"}
+[Der Wert $Y_i$ von Person $i$ ist normalverteilt ($\mathcal{N}$) mit Mittelwert $\mu_i$ und Varianz $\sigma^2$; $\mu_i$ liegt auf der Geraden mit Achsenabschnitt $\beta_0$ und Steigung $\beta_1$.]{.lesehilfe}
+
+![](figures/fig3a_normal.png){fig-alt="Regressionsgerade für einen Symptomwert mit Normalverteilungen um den Mittelwert bei 5, 20 und 35 Sitzungen." width="58%"}
 ::::
 :::: {.column width="50%"}
 ::: {.fragment fragment-index=1}
-[Binäre AV: Remission]{.logit}
+[Binäre abhängige Variable: Remission]{.logit}
 
 $$Y_i \sim \mathcal{B}(1,\ \pi_i), \quad \pi_i = \ ?$$
+
+[Binomialverteilung ($\mathcal{B}$) mit einem Versuch: $Y_i$ ist 1 (Remission) mit der Wahrscheinlichkeit $\pi_i$, sonst 0.]{.lesehilfe}
 :::
 
 ::: {.r-stack}
-![](figures/fig3b_1_balken.png){.fragment fragment-index=2 fig-alt="Balken für die Wahrscheinlichkeit von 0 und 1 bei 5, 20 und 35 Sitzungen; mit mehr Sitzungen wächst der Balken bei 1." width="74%"}
+![](figures/fig3b_1_balken.png){.fragment fragment-index=2 fig-alt="Balken für die Wahrscheinlichkeit von 0 und 1 bei 5, 20 und 35 Sitzungen; mit mehr Sitzungen wächst der Balken bei 1." width="58%"}
 
-![](figures/fig3b_binomial.png){.fragment fragment-index=3 fig-alt="Dieselben Balken; zusätzlich markiert bei 5, 20 und 35 Sitzungen je ein Kreis pi, die Wahrscheinlichkeit für 1. Mit mehr Sitzungen liegt der Kreis höher." width="74%"}
+![](figures/fig3b_binomial.png){.fragment fragment-index=3 fig-alt="Dieselben Balken; zusätzlich markiert bei 5, 20 und 35 Sitzungen je ein Kreis pi, die Wahrscheinlichkeit für 1. Mit mehr Sitzungen liegt der Kreis höher." width="58%"}
 :::
 ::::
 :::::
@@ -232,6 +307,8 @@ bei 20 Single-Choice-Fragen rät. Hier ziehen wir pro Person genau einmal: n = 1
 Frage an den Raum: «Was liegt nahe für pi_i?» → «Die Gerade wie links!»
 [Klick] Merke-Box: gleiche Struktur.
 Genau das hat die lineare Regression gemacht, und das ging schief. Warum?
+Falls jemand nach sigma^2 fragt: Bei B(1, pi) ist die Varianz pi(1 − pi). Sie hängt
+an pi, deshalb braucht es keinen eigenen Streuungsparameter.
 :::
 
 ## Das Problem: der Wertebereich
@@ -240,58 +317,34 @@ $\pi_i$ liegt zwischen 0 und 1, aber $\beta_0 + \beta_1 x_i$ kann jeden Wert ann
 
 ```{=html}
 <table class="leiter">
-  <tr class="fragment"><td><b>Wahrscheinlichkeit</b></td><td>\(\pi\)</td><td class="range">0 bis 1</td><td><img class="zahlenstrahl" src="figures/zahlenstrahl_1_pi.png" alt="Zahlenstrahl: nur das kurze Stück von 0 bis 1 ist markiert."></td></tr>
-  <tr class="fragment"><td><b>Odds</b></td><td>\(\dfrac{\pi}{1-\pi}\)</td><td class="range">0 bis ∞</td><td><img class="zahlenstrahl" src="figures/zahlenstrahl_2_odds.png" alt="Zahlenstrahl: markiert ist alles ab 0, mit Pfeil nach rechts ins Unendliche."></td></tr>
-  <tr class="fragment"><td><b>Log-Odds</b></td><td>\(\ln\!\left(\dfrac{\pi}{1-\pi}\right)\)</td><td class="range">−∞ bis ∞</td><td><img class="zahlenstrahl" src="figures/zahlenstrahl_3_logodds.png" alt="Zahlenstrahl: der ganze Zahlenstrahl ist markiert, mit Pfeilen nach links und rechts."></td></tr>
+  <tr class="fragment"><td><b>Wahrscheinlichkeit</b></td><td>\(\pi\)</td><td class="range">0 bis 1</td><td><img class="zahlenstrahl" src="figures/zahlenstrahl_1_pi.png" alt="Zahlenstrahl: nur das kurze Stück von 0 bis 1 ist markiert. Farbige Striche bei 0 (orange), .5 (grün) und 1 (lila)."></td></tr>
+  <tr class="fragment"><td><b>Odds</b></td><td>\(\dfrac{\pi}{1-\pi}\)</td><td class="range">0 bis ∞</td><td><img class="zahlenstrahl" src="figures/zahlenstrahl_2_odds.png" alt="Zahlenstrahl: markiert ist alles ab 0, mit Pfeil nach rechts ins Unendliche. Orange bei 0, grün bei 1, lila an der Pfeilspitze (unendlich)."></td></tr>
+  <tr class="fragment"><td><b>Log-Odds</b></td><td>\(\ln\!\left(\dfrac{\pi}{1-\pi}\right)\)</td><td class="range">−∞ bis ∞</td><td><img class="zahlenstrahl" src="figures/zahlenstrahl_3_logodds.png" alt="Zahlenstrahl: der ganze Zahlenstrahl ist markiert, mit Pfeilen nach links und rechts. Orange an der linken Pfeilspitze (minus unendlich), grün bei 0, lila an der rechten Pfeilspitze (unendlich)."></td></tr>
 </table>
 ```
+
+[$\pi$: Wahrscheinlichkeit einer Remission · Odds: Wahrscheinlichkeit dafür geteilt durch dagegen · $\ln$: natürlicher Logarithmus · $\infty$: unendlich · Farbe: dasselbe $\pi$]{.lesehilfe}
 
 ::: {.fragment .denkpause}
 **Denkpause:** Wenn $\pi = .8$, wie gross sind die Odds?
 :::
 
 ::: {.fragment}
-$.8 / .2 = `r odds_80`$: viermal so wahrscheinlich wie nicht. Kennen Sie aus dem Bayes-Beispiel (Prior-Odds).
+$.8 / .2 = `r odds_80`$: Auf `r odds_80` Remissionen kommt eine Nicht-Remission. Kennen Sie aus dem Bayes-Beispiel in Statistik I (Prior-Odds).
 :::
 
 ::: {.notes}
 IDEE 2 (4:20–6:10), 5 Klicks (die Zahlenstrahlen kommen mit ihrer Zeile). v3: −10 s; die Frage «kleinster, grösster Wert?» nur bei Odds und Log-Odds (der Bereich von π ist die Prämisse), Denkpause 15 s.
 [Klick] Wahrscheinlichkeit, [Klick] Odds, [Klick] Log-Odds; jeweils «Was ist der
 kleinste, was der grösste Wert?» Auf den Zahlenstrahl zeigen: der Bereich wächst.
+Farben mitverfolgen: «Orange ist π = 0: Odds 0, Log-Odds minus unendlich. Grün ist
+π = .5: Odds 1, Log-Odds 0. Lila ist π = 1: unendlich.» (π = .8 bewusst nicht
+markiert, das ist die Denkpause.)
 [Klick] DENKPAUSE, 15 Sekunden, Antwort aus dem Raum holen (4). [Klick] Auflösung.
-Symmetrie mündlich (Folie 7 ist Reserve): «.2 und .8 liegen symmetrisch um 0.»
-Danach im Normalfall **G 8 Enter** (Folie 7 überspringen); Folie 7 nur, wenn hier ≤ 5:45.
+Symmetrie mündlich: «.2 und .8 liegen symmetrisch um 0.»
 Anknüpfen an Statistik I: odds_prior <- 0.8/0.2, und zurück mit odds/(1 + odds).
 Log-Odds: ln von Werten zwischen 0 und 1 ist negativ, ln(1) = 0, ln von Werten > 1
 positiv. Damit ist der ganze Zahlenstrahl abgedeckt.
-:::
-
-## Drei Skalen, dieselbe Information
-
-```{r transform-table}
-#| results: asis
-fmt_tab <- function(x) sub("-", "\u2212", formatC(x, format = "f", digits = 2))
-# Klick 1 hebt die symmetrischen Zeilen .20 und .80 hervor (±1.39)
-hl <- round(tt$pi, 2) %in% c(0.20, 0.80)
-rows <- sprintf('<tr%s><td>%s</td><td>%s</td><td>%s</td></tr>',
-                ifelse(hl, ' class="fragment custom hl-row" data-fragment-index="1"', ""),
-                fmt_tab(tt$pi), fmt_tab(tt$odds), fmt_tab(tt$log_odds))
-cat('<table class="transform"><thead><tr>',
-    '<th>Wahrscheinlichkeit π</th><th>Odds π/(1−π)</th>',
-    '<th>Log-Odds ln(π/(1−π))</th></tr></thead><tbody>',
-    rows, '</tbody></table>', sep = "\n")
-```
-
-::: {.fragment .merke fragment-index=2}
-$\pi = .5$ wird zu Log-Odds 0. Gleich wahrscheinlich und gleich unwahrscheinlich liegen symmetrisch um 0.
-:::
-
-::: {.notes}
-RESERVE (v3): Diese Folie wird im Normalfall übersprungen, damit der Selbsttest am Ende
-Platz hat. Auf Folie 6 nach der Auflösung **G 8 Enter** (landet auf Folie 8 mit
-verborgenen Aufbauten). Nur zeigen, wenn Folie 6 bei 5:45 oder früher fertig ist.
-Dann 2 Klicks, 30 s: [Klick] Zeilen .20 und .80 hervorgehoben: ±1.39. [Klick] Merke-Box.
-Die Symmetrie (π = .5 → Log-Odds 0) kommt sonst mündlich auf Folie 6.
 :::
 
 ## Das logistische Regressionsmodell
@@ -314,6 +367,8 @@ Zurück zur Wahrscheinlichkeit, wie im Bayes-Beispiel:
 
 ::: {.fragment .highlight-current-blue fragment-index=2}
 $$\text{Odds}_i = e^{\text{Log-Odds}_i} = e^{\beta_0 + \beta_1 x_i}$$
+
+[$e \approx 2.718$ (Eulersche Zahl); «$e$ hoch …» macht den Logarithmus $\ln$ rückgängig.]{.lesehilfe}
 :::
 :::
 
@@ -330,13 +385,13 @@ $$
 ::: {.fragment fragment-index=4}
 ![](figures/fig4_s_kurve.png){fig-alt="Dieselben Daten mit einer S-förmigen Kurve, die von nahe 0 bei wenigen Sitzungen auf nahe 1 bei vielen Sitzungen ansteigt und den Bereich 0 bis 1 nie verlässt."}
 
-[Kurve: $\beta_0 = `r beta0`$, $\beta_1 = `r beta1`$]{.small-note}
+[Kurve mit Achsenabschnitt $\beta_0 = `r beta0`$ und Steigung $\beta_1 = `r beta1`$]{.small-note}
 :::
 :::
 ::::
 
 ::: {.notes}
-(6:10–7:10), 4 Klicks. Start: «pi_i = ?» wie auf Folie 5.
+(6:10–7:10), 4 Klicks. Start: «pi_i = ?» wie auf Folie 6.
 [Klick] Logit-Gleichung ersetzt das Fragezeichen. Der lineare Teil bleibt: links steht
 jetzt logit(pi_i) statt mu_i.
 [Klick] Zurückrechnen, erster Schritt (blau): e hoch Log-Odds gibt die Odds.
@@ -345,7 +400,7 @@ Dieselbe Formel wie im Bayes-Beispiel.
 [Klick] Ergebnis: Die S-Kurve. Sie bleibt zwischen 0 und 1, egal wie viele Sitzungen.
 :::
 
-## Was passiert, wenn sich $\beta_1$ verdoppelt? {.nostretch}
+## Schneller wirkende Therapie: $\beta_1$ verdoppelt sich {.nostretch}
 
 ```{r slider-data}
 #| results: asis
@@ -360,13 +415,15 @@ cat("<script>window.remissionData = ",
 ```{=html}
 <div class="logit-widget">
   <div class="slider-controls">
-    <label>β₀ = <b id="b0-val"></b>
+    <label>Achsenabschnitt β₀ = <b id="b0-val"></b>
       <input type="range" id="b0" min="-8" max="4" step="0.1"></label>
-    <label>β₁ = <b id="b1-val"></b>
+    <label>Steigung β₁ = <b id="b1-val"></b>
       <input type="range" id="b1" min="-0.3" max="0.6" step="0.01"></label>
     <label><input type="checkbox" id="show-ref" checked> Ausgangskurve</label>
-    <button id="animate" type="button">Animieren</button>
-    <button id="reset" type="button">Zurücksetzen</button>
+    <div class="slider-buttons">
+      <button id="animate" type="button">Animieren</button>
+      <button id="reset" type="button">Zurücksetzen</button>
+    </div>
   </div>
   <svg id="logit-svg" viewBox="0 0 900 400" role="img"
        aria-label="Interaktive S-Kurve der logistischen Regression"></svg>
@@ -416,8 +473,10 @@ cat("<script>window.remissionData = ",
                               "stroke-width": 4.5});
   const midLine = el("line", {stroke: "#009E73", "stroke-width": 2,
                               "stroke-dasharray": "4 4"});
+  // Beschriftung unter der 0.5-Linie, mit weissem Rand gegen Kurven und Punkte
   const midText = el("text", {"font-size": 20, fill: "#009E73",
-                              "text-anchor": "start"});
+                              stroke: "#fff", "stroke-width": 5,
+                              "paint-order": "stroke", "text-anchor": "start"});
   const pathFor = (b0, b1) => {
     let p = "";
     for (let k = 0; k <= 200; k++) {
@@ -441,8 +500,15 @@ cat("<script>window.remissionData = ",
     if (isFinite(xm) && xm >= xMin && xm <= xMax) {
       midLine.setAttribute("x1", sx(xm)); midLine.setAttribute("x2", sx(xm));
       midLine.setAttribute("y1", sy(0.5)); midLine.setAttribute("y2", sy(yMin));
-      midText.setAttribute("x", sx(xm) + 8); midText.setAttribute("y", sy(0.5) - 10);
-      midText.textContent = "π = .5 bei x = " + fmt(xm, 1);
+      // Steigende Kurve: rechts unterhalb von .5 ist frei; fallende Kurve: links.
+      // Am Rand auf die andere Seite wechseln, damit der Text im Bild bleibt.
+      let right = b1 > 0;
+      if (right && sx(xm) > W - m.r - 270) right = false;
+      if (!right && sx(xm) < m.l + 270) right = true;
+      midText.setAttribute("text-anchor", right ? "start" : "end");
+      midText.setAttribute("x", sx(xm) + (right ? 10 : -10));
+      midText.setAttribute("y", sy(0.5) + 26);
+      midText.textContent = "π = .5 bei " + fmt(xm, 1) + " Sitzungen";
       midLine.style.display = midText.style.display = "";
     } else {
       midLine.style.display = midText.style.display = "none";
@@ -486,10 +552,16 @@ Vorher, noch auf Folie 8: [Cockpit] Blick aufs Handy (Live Feedback): «Kurzer
 Blick auf Ihre Regler: Tempo … , Schwierigkeit … .» Bei «zu schnell»: Denkpause hier
 20 s statt 15 s. Bei weniger als ~5 Eingaben: nichts sagen.
 Erst fragen, dann schieben: «β1 von 0.15 auf 0.30. Wird die Kurve steiler, flacher,
-oder verschiebt sie sich? Kurz mit Ihrem Nebenan besprechen.» (15 s)
+oder verschiebt sie sich? Und ab wie vielen Sitzungen ist Remission so wahrscheinlich
+wie keine? Kurz mit Ihrem Nebenan besprechen.» (15 s)
 Dann «Animieren» klicken (Maus, kein Folienklick): β1 läuft in 1.5 s von 0.15 auf
 0.30. Auflösung: steiler UND der Punkt mit π = .5 wandert von
-x = `r x_mid` nach x = `r x_mid2` (weil π = .5 bei x = −β0/β1).
+x = `r x_mid` nach x = `r x_mid2` (weil π = .5 bei x = −β0/β1). Klinisch: «Mit der
+schneller wirkenden Therapie ist Remission schon nach `r x_mid2` statt nach `r x_mid`
+Sitzungen so wahrscheinlich wie keine.»
+Falls jemand fragt, ob mehr Sitzungen die Remission verursachen: «Das sagen diese
+Daten nicht. Es sind Beobachtungsdaten; wer schwerer belastet ist, bekommt oft mehr
+Sitzungen. Dazu gibt es eine Übung auf der Materialseite.»
 Kein negatives β1 mehr (v3: die 15 s gehen in den Selbsttest). Falls jemand fragt:
 «Kurve fällt», einmal kurz schieben.
 Fallback (kein Browser/JS): Backup-Folie am Ende (fig5).
@@ -503,7 +575,7 @@ Selbsttest: G 11 Enter, Mitnehmen selbst sagen.
 :::: {.columns}
 ::: {.column width="72%"}
 ::: {.klicker}
-**KlickerUZH (K-Prim):** Markieren Sie jede Aussage als richtig oder falsch.
+**KlickerUZH (K-Prim):** Welche der folgenden Aussagen über die logistische Regression treffen zu? Wählen Sie für jede Aussage aus, ob sie richtig oder falsch ist.
 
 A. $\mathcal{B}(1, \pi_i)$ gibt jeder Person ein eigenes $\pi_i$, so wie $\mathcal{N}(\mu_i, \sigma^2)$ jeder Person ein eigenes $\mu_i$ gibt.
 
@@ -534,7 +606,7 @@ A richtig: «Gleiche Struktur, andere Verteilung: ein Parameter pro Person, der 
 B falsch: «Linear sind die Log-Odds. π folgt der S-Kurve und bleibt zwischen 0 und 1.»
 C richtig: «`r fmt_pi(pi_check)` durch `r fmt_pi(1 - pi_check)` ist `r odds_check`: drei Remissionen auf eine Nicht-Remission.»
 D falsch: «Log-Odds laufen von minus bis plus unendlich; unter π = .5 sind sie negativ.
-Genau deshalb passt die Gerade.»
+Genau deshalb darf hier eine Gerade stehen.»
 Bei einem Balken mit vielen Fehlern: diesen Satz zuerst, und er ist der erste Satz der Diskussion.
 [Fenster] Ctrl+Tab zurück zu den Folien, weiter zu Mitnehmen.
 Fallback ohne Netz: Handzeichen je Aussage («Wer sagt richtig?»), gleiche vier Sätze.
@@ -544,12 +616,12 @@ Fallback < 8 Teilnehmende: Block trotzdem öffnen, aber statt Balken zwei Person
 ## Mitnehmen
 
 ::: {.merke}
-1. Jedes statistische Modell ist eine **Verteilungsannahme**: Normalverteilung für stetige, $\mathcal{B}(1, \pi_i)$ für binäre AVs.
-2. Weil $\pi_i$ zwischen 0 und 1 liegt, modellieren wir die **Log-Odds** von $\pi_i$ als lineare Funktion von $x$.
+1. Jedes statistische Modell ist eine **Verteilungsannahme**: Normalverteilung für stetige, Binomialverteilung $\mathcal{B}(1, \pi_i)$ für binäre abhängige Variablen.
+2. Weil die Wahrscheinlichkeit $\pi_i$ zwischen 0 und 1 liegt, modellieren wir ihre **Log-Odds** als lineare Funktion von $x$ (Anzahl Sitzungen). So sagt das Modell nie eine unmögliche Remissionswahrscheinlichkeit vorher.
 :::
 
 ::: {.fragment fragment-index=1}
-**Als Nächstes:** Was bedeutet $\beta_1$? Odds Ratios · Schätzung · in R:
+**Als Nächstes:** Was bedeutet die Steigung $\beta_1$? Odds Ratios · Schätzung · in R:
 
 ```r
 glm(remission ~ sitzungen, family = binomial, data = remission_data)
@@ -583,8 +655,8 @@ Ohne Selbsttest (Notbremse, G 11 Enter): die zwei Sätze selbst sagen (30 s):
 den Parameter so, dass der lineare Teil passt.» Dann derselbe eine Klick: Ausblick.
 :::
 
-## Backup: β₁ verdoppelt {visibility="uncounted"}
+## Backup: schneller wirkende Therapie, β₁ verdoppelt {visibility="uncounted"}
 
-![](figures/fig5_s_kurve_beta1_doppelt.png){fig-alt="Zwei S-Kurven: durchgezogen mit Beta1 gleich 0.15, gestrichelt mit Beta1 gleich 0.30. Die gestrichelte Kurve ist steiler und erreicht 0.5 schon bei 10 statt bei 20 Sitzungen." width="85%"}
+![](figures/fig5_s_kurve_beta1_doppelt.png){fig-alt="Zwei S-Kurven: durchgezogen mit Beta1 gleich 0.15, gestrichelt mit Beta1 gleich 0.30. Die gestrichelte Kurve ist steiler und erreicht 0.5 schon bei 10 statt bei 20 Sitzungen." width="78%"}
 
-π = .5 bei $x = -\beta_0/\beta_1$: `r x_mid` Sitzungen ($\beta_1 = `r beta1`$) vs. `r x_mid2` Sitzungen ($\beta_1 = `r 2 * beta1`$).
+Remission so wahrscheinlich wie keine ($\pi = .5$): mit $\beta_1 = `r beta1`$ nach `r x_mid` Sitzungen,<br>mit doppelter Steigung ($\beta_1 = `r 2 * beta1`$) schon nach `r x_mid2`. Allgemein: nach $-\beta_0/\beta_1$ Sitzungen.

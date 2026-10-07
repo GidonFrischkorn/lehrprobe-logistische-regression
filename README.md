@@ -58,7 +58,11 @@ laden MathJax aus dem Netz.
 | Pfad | Inhalt |
 |------|--------|
 | `slides.qmd` | Folien (Quarto reveal.js); führt beim Rendern alle Skripte aus |
-| `index.qmd` | Begleitseite mit Lernziel, Code und Daten |
+| `index.qmd` | Begleitseite: Einordnung, Modell, Notation, Daten |
+| `explorer.qmd`, `explorer.js`, `explorer.css` | Explorer der logistischen Regression und Übungsfragen (exams2forms) |
+| `uebungen/` | Übungsfragen als R/exams-Dateien (`.Rmd`), Lösungen werden in R berechnet |
+| `webex/` | `webex.css`, `webex.js` aus exams2forms 0.2-2 (Tooltips übersetzt) |
+| `r-code.qmd` | eigene Seite mit dem R-Code (Simulation, Zahlen, Abbildungen) und Aufgaben |
 | `custom.scss` | Theme der Folien |
 | `title-slide.html` | Titelfolie (Quarto-Partial) mit dem KlickerUZH-QR, wenn `klicker-join-url` in `slides.qmd` gesetzt ist |
 | `R/01_simulate_data.R` | simuliert `data/remission.csv`, Parameter in `output/sim_params.csv` |
@@ -85,9 +89,9 @@ beim Rendern ausführt. Die Website wird nach `docs/` geschrieben
 (GitHub Pages: Branch `main`, Ordner `/docs`).
 
 Getestet mit R 4.6.1, ggplot2 4.0.3, patchwork 1.3.2, jsonlite 2.0.0,
-knitr 1.52, qrcode 0.3.0 und Quarto 1.10.18. Ohne das Paket `qrcode` wird
-die letzte Folie ohne QR-Code gerendert. Der KlickerUZH-QR auf Titelfolie, Folie 3
-und Folie 10 entsteht aus dem YAML-Feld `klicker-join-url` in `slides.qmd`; ist es
+knitr 1.52, qrcode 0.3.0, exams 2.4-4, exams2forms 0.2-2 und Quarto 1.10.18. Ohne das Paket `qrcode` wird
+die letzte Folie ohne QR-Code gerendert. Der KlickerUZH-QR auf Titelfolie, Folie 4
+und Folie 11 entsteht aus dem YAML-Feld `klicker-join-url` in `slides.qmd`; ist es
 leer, zeigen die Folien einen Platzhalter.
 
 ## Selbst ausprobieren
@@ -102,8 +106,10 @@ leer, zeigen die Folien einen Platzhalter.
 
 ## Lizenz
 
-- Folien, Texte, Abbildungen (`slides.qmd`, `index.qmd`, `custom.scss`,
+- Folien, Texte, Abbildungen (`slides.qmd`, `index.qmd`, `r-code.qmd`, `custom.scss`,
   `figures/`): [CC BY 4.0](LICENSE-CC-BY-4.0.txt)
+- `webex/` (aus dem R-Paket exams2forms, Achim Zeileis): GPL-3
+- Fotos (`images/`): CC0 1.0, Quellen in [images/QUELLEN.md](images/QUELLEN.md)
 - R-Code (`R/`): [MIT](LICENSE)
 
 ## Zitieren

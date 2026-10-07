@@ -1,0 +1,26 @@
+Question
+========
+Stellen Sie $\beta_0 = 0$ und $\beta_1 = 0$ ein. Was zeigt die Kurve, und was bedeutet das für das Beispiel?
+
+Answerlist
+----------
+* Eine waagrechte Linie bei $\pi = .5$: Die Anzahl Sitzungen hängt nicht mit Remission zusammen.
+* Eine waagrechte Linie bei $\pi = 0$: Niemand remittiert.
+* Eine steile S-Kurve mit $\pi = .5$ bei 0 Sitzungen.
+* Eine Gerade durch den Ursprung, wie in der linearen Regression.
+
+Solution
+========
+Answerlist
+----------
+* Richtig. Mit $\beta_1 = 0$ sind die Log-Odds für alle gleich ($\beta_0 = 0$), also auch $\pi$: Log-Odds 0 heisst Odds 1 und $\pi = .5$. $\beta_1 = 0$ bedeutet «kein Zusammenhang».
+* Falsch. $\pi = 0$ würde Log-Odds von $-\infty$ verlangen; mit $\beta_0 = 0$ sind die Log-Odds 0.
+* Falsch. Ohne Steigung gibt es keine S-Form, die Kurve ist flach.
+* Falsch. Die Kurve beschreibt $\pi$, und $\pi$ ist hier für alle .5.
+
+Meta-information
+================
+exname: beta1_null
+extype: schoice
+exsolution: 1000
+exshuffle: TRUE

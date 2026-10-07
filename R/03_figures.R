@@ -116,18 +116,21 @@ bars <- data.frame(
   y  = rep(c(0, 1), times = length(x_show)),
   p  = as.vector(rbind(1 - pi_show, pi_show))
 )
-bar_w <- 8
+# Balkenlänge = Wahrscheinlichkeit * bar_w. Der längste Balken (p ≈ .90 bei 5
+# Sitzungen) muss links von x = 5 noch ins Bild passen: 5 - .90 * 7 ≈ -1.3.
+bar_w <- 7
 p_bern_bars <- ggplot(bars) +
   geom_segment(data = data.frame(x0 = x_show),
                aes(x = x0, xend = x0, y = -0.2, yend = 1.2),
                colour = "grey70", linetype = "dashed") +
   geom_rect(aes(xmin = x0 - p * bar_w, xmax = x0, ymin = y - 0.07,
                 ymax = y + 0.07), fill = col_logit, alpha = 0.85) +
-  scale_x_continuous("Anzahl Therapiesitzungen", breaks = seq(0, 40, 10),
-                     limits = c(-2, 42)) +
+  scale_x_continuous("Anzahl Therapiesitzungen", breaks = seq(0, 40, 10)) +
   scale_y_continuous("Remission", breaks = c(0, 0.5, 1),
-                     labels = c("0 = nein", "0.5", "1 = ja"),
-                     limits = c(-0.2, 1.2)) +
+                     labels = c("0 = nein", "0.5", "1 = ja")) +
+  # Grenzen über coord_cartesian(): scale-limits würden Balken, die über den
+  # Rand reichen, ohne Fehlermeldung ganz weglassen (so fehlte der Balken bei 5).
+  coord_cartesian(xlim = c(-2, 42), ylim = c(-0.2, 1.2)) +
   theme_lecture
 p_bern <- p_bern_bars +
   geom_point(data = data.frame(x0 = x_show, pi = pi_show),
@@ -168,33 +171,53 @@ save_fig(p_s2, "fig5_s_kurve_beta1_doppelt.png")
 # 5) Zahlenstrahlen für die Leiter auf Folie 6 ---------------------------------
 # Gleiche Leinwand und gleicher Ausschnitt für alle drei Zeilen, damit 0 und 1
 # untereinander liegen und man sieht, wie der Wertebereich wächst.
-zs_lim <- c(-4, 6)
-zahlenstrahl <- function(from, to) {
+# Drei Ankerwerte wandern mit, jeder in seiner Farbe: pi = 0, .5 und 1 und ihre
+# Werte auf der Odds- und der Log-Odds-Skala. Grün für pi = .5 wie auf dem Slider.
+# pi = .8 bewusst nicht: Odds 4 ist die Antwort der Denkpause auf derselben Folie.
+zs_lim <- c(-3, 4)
+anker <- data.frame(
+  pi  = c(0, 0.5, 1),
+  col = c("#E69F00", "#009E73", "#CC79A7")   # Okabe-Ito: orange, grün, lila
+)
+anker$odds     <- anker$pi / (1 - anker$pi)   # 0, 1, Inf
+anker$log_odds <- log(anker$odds)             # -Inf, 0, Inf
+fmt_anker <- function(v) {
+  out <- ifelse(is.infinite(v), ifelse(v > 0, "∞", "−∞"),
+                sub("^0\\.", ".", as.character(v)))
+  ifelse(v == 0, "0", out)
+}
+zahlenstrahl <- function(from, to, werte) {
   lo <- max(from, zs_lim[1] + 0.15)
   hi <- min(to, zs_lim[2] - 0.15)
   ends <- if (is.finite(from) && is.finite(to)) NULL else
     arrow(length = unit(0.18, "inches"), type = "closed",
           ends = if (is.finite(from)) "last" else if (is.finite(to)) "first"
                  else "both")
-  finite_ends <- c(from, to)[is.finite(c(from, to))]
+  # Unendliche Ankerwerte sitzen an der Pfeilspitze
+  x_anker <- pmin(pmax(werte, zs_lim[1] + 0.35), zs_lim[2] - 0.35)
   ggplot() +
     annotate("segment", x = zs_lim[1], xend = zs_lim[2], y = 0, yend = 0,
              colour = "grey85", linewidth = 1) +
-    annotate("segment", x = lo, xend = hi, y = 0, yend = 0,
-             colour = col_logit, linewidth = 3.2, arrow = ends,
-             linejoin = "mitre") +
-    annotate("point", x = finite_ends, y = rep(0, length(finite_ends)),
-             colour = col_logit, size = 4.5) +
-    annotate("segment", x = c(0, 1), xend = c(0, 1), y = -0.35, yend = 0.35,
-             colour = "grey30", linewidth = 0.9) +
-    annotate("text", x = c(0, 1), y = -0.95, label = c("0", "1"), size = 7,
-             colour = "grey30") +
+    # geom_segment statt annotate: annotate(..., arrow = NULL) erzeugt in
+    # ggplot2 4.0 einen leeren Layer, der Balken von pi fehlte dann stillschweigend
+    geom_segment(data = data.frame(x = lo, xend = hi),
+                 aes(x = x, xend = xend, y = 0, yend = 0),
+                 colour = col_logit, linewidth = 3.2, arrow = ends,
+                 linejoin = "mitre") +
+    # Ankerwerte als farbige Striche quer zur Linie (Punkte würden den kurzen
+    # blauen Bereich von pi ganz verdecken)
+    annotate("segment", x = x_anker, xend = x_anker, y = -0.45, yend = 0.45,
+             colour = anker$col, linewidth = 2.4) +
+    annotate("text", x = x_anker, y = -0.95, label = fmt_anker(werte),
+             size = 7.5, fontface = "bold", colour = anker$col) +
     coord_cartesian(xlim = zs_lim, ylim = c(-1.35, 0.6), expand = FALSE) +
     theme_void()
 }
-save_fig(zahlenstrahl(0, 1), "zahlenstrahl_1_pi.png", w = 4, h = 0.8)
-save_fig(zahlenstrahl(0, Inf), "zahlenstrahl_2_odds.png", w = 4, h = 0.8)
-save_fig(zahlenstrahl(-Inf, Inf), "zahlenstrahl_3_logodds.png", w = 4, h = 0.8)
+save_fig(zahlenstrahl(0, 1, anker$pi), "zahlenstrahl_1_pi.png", w = 4, h = 0.8)
+save_fig(zahlenstrahl(0, Inf, anker$odds), "zahlenstrahl_2_odds.png",
+         w = 4, h = 0.8)
+save_fig(zahlenstrahl(-Inf, Inf, anker$log_odds), "zahlenstrahl_3_logodds.png",
+         w = 4, h = 0.8)
 
 cat("Abbildungen gespeichert in figures/:\n")
 print(list.files("figures"))

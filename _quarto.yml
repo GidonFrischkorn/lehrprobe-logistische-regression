@@ -4,8 +4,11 @@ project:
   resources:
     - data/
     - R/
+    - explorer.js
   render:
     - index.qmd
+    - explorer.qmd
+    - r-code.qmd
     - slides.qmd
 
 website:
@@ -14,6 +17,10 @@ website:
     left:
       - href: index.qmd
         text: Materialien
+      - href: explorer.qmd
+        text: Explorer & Übungen
+      - href: r-code.qmd
+        text: R-Code
       - href: slides.qmd
         text: Folien
     right:

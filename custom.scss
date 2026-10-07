@@ -69,16 +69,6 @@ $presentation-heading-font-weight: 600;
 .reveal .lm { color: #D55E00; font-weight: 600; }
 .reveal .logit { color: #0072B2; font-weight: 600; }
 
-.reveal table.transform {
-  font-size: 0.85em;
-  margin: 0.4em auto;
-}
-.reveal table.transform th,
-.reveal table.transform td {
-  padding: 0.2em 0.9em;
-  text-align: right;
-}
-
 table.leiter {
   margin: 0.3em 0 0.5em 0;
   border-collapse: collapse;
@@ -110,6 +100,13 @@ table.leiter td.range {
   font-size: 0.7em;
   margin-bottom: 0.2em;
 }
+// Folie 9: beide Knöpfe gemeinsam in einer eigenen Zeile unter den Reglern
+.logit-widget .slider-buttons {
+  flex-basis: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 1em;
+}
 .logit-widget input[type="range"] {
   width: 220px;
   vertical-align: middle;
@@ -125,28 +122,19 @@ table.leiter td.range {
 }
 
 // Schrittweiser Aufbau (Fragmente)
-// Folie 6: Zahlenstrahl je Leiterzeile, gleiche Breite, damit 0 und 1 untereinander liegen
+// Folie 7: Zahlenstrahl je Leiterzeile, gleiche Breite, damit 0 und 1 untereinander liegen
 table.leiter img.zahlenstrahl {
   display: block;
-  width: 380px;
+  width: 480px;
   height: auto;
   margin: 0;
 }
-// Folie 7: Zeilen .20 und .80 hervorheben (Fragment-Stil "custom" bleibt sichtbar)
-.reveal table.transform tr.hl-row td {
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-.reveal table.transform tr.hl-row.visible td {
-  background: #eaf3fa;
-  color: #0072B2;
-  font-weight: 600;
-}
-// Folie 10: Merke-Punkt 2 erscheint als eigene Liste
+// Folie 11: Merke-Punkt 2 erscheint als eigene Liste
 .merke ol {
   margin-top: 0.1em;
   margin-bottom: 0.1em;
 }
-// Folie 4: Ebenen fest in der Höhe, damit der Text darunter über der Fusszeile bleibt
+// Folie 5: Ebenen fest in der Höhe, damit der Text darunter über der Fusszeile bleibt
 .reveal .r-stack.layers > p {
   margin: 0;
   width: 100%;
@@ -165,7 +153,7 @@ table.leiter img.zahlenstrahl {
   margin: 0.3em 0;
 }
 
-// v3: KlickerUZH-Beitritt (QR + Link) auf Titelfolie, Folie 3 und Selbsttest
+// v3: KlickerUZH-Beitritt (QR + Link) auf Titelfolie, Folie 4 und Selbsttest
 .reveal .join-box {
   display: flex;
   flex-direction: column;
@@ -179,6 +167,9 @@ table.leiter img.zahlenstrahl {
 }
 .reveal .join-box img {
   margin: 0;
+  background: #fff;
+  padding: 8px;                 // Ruhezone: der KlickerUZH-QR hat keinen Rand
+  box-sizing: content-box;
   image-rendering: pixelated;   // scharfe QR-Module bei jeder Skalierung
 }
 .reveal .join-box.join-missing {
@@ -199,4 +190,56 @@ table.leiter img.zahlenstrahl {
 }
 .reveal .selbsttest h2 {
   font-size: 1.25em;
+}
+
+// Lesehilfe: jede Formel auch in Worten (Folien 6, 7, 9)
+.reveal .lesehilfe {
+  display: block;
+  font-size: 0.55em;
+  line-height: 1.3;
+  color: #5a6470;
+  margin: 0.1em 0 0.3em;
+}
+
+// Folie 3: Beispiel Remission, zwei Fotos mit Symptomzähler
+.reveal .remission > p:first-of-type { font-size: 0.75em; }
+.reveal .remission img.foto {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin: 0.2em 0;
+}
+.reveal .remission .column p { font-size: 0.75em; margin: 0.15em 0; }
+.reveal .remission .symptome {
+  color: #0072B2;
+  letter-spacing: 0.08em;
+  margin-right: 0.4em;
+}
+.reveal .bildnachweis {
+  position: absolute;
+  bottom: 0.6em;
+  right: 0;
+  font-size: 0.4em;
+  color: #8a939c;
+}
+.reveal .remission .schwelle {
+  color: #D55E00;
+  font-weight: 700;
+  margin: 0 0.1em;
+}
+.reveal .remission .merke { margin-top: 0.5em; }
+
+// Folie 5: lm()-Befehl neben der Abbildung
+.reveal .lm-code { font-size: 0.7em; padding-top: 1.2em; }
+.reveal .lm-code pre { width: 100%; margin: 0.3em 0; font-size: 1em; }
+.reveal .lm-code pre code { font-size: 0.82em; line-height: 1.35; max-height: none; }
+.reveal .lm-code .merke { margin-top: 1em; }
+
+// Folie 4: Frage wie in KlickerUZH, kompakter, damit der QR noch Platz hat
+.reveal .intuition .klicker {
+  font-size: 0.68em;
+}
+.reveal .intuition .klicker p {
+  margin: 0.35em 0;
 }

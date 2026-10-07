@@ -1,0 +1,109 @@
+---
+title: "Explorer und Übungsfragen"
+subtitle: "Die Parameter der logistischen Regression selbst ausprobieren"
+lang: de
+format:
+  html:
+    toc: true
+    css: [webex/webex.css, explorer.css]
+    include-after-body: webex/webex.js
+---
+
+```{r setup}
+#| include: false
+library(exams2forms)
+p  <- read.csv("output/sim_params.csv")
+b0 <- p$value[p$parameter == "beta0"]
+b1 <- p$value[p$parameter == "beta1"]
+```
+
+Mit dem Explorer können Sie die beiden Parameter der logistischen Regression
+verändern und sehen sofort, wie sich die Kurve der Remissionswahrscheinlichkeit
+verschiebt. Die Übungsfragen darunter lassen sich alle mit dem Explorer lösen.
+Die Notation ist auf der [Materialseite](index.qmd#die-notation-auf-einen-blick)
+erklärt.
+
+## Explorer
+
+Das Modell lautet
+$\ln\!\left(\frac{\pi}{1-\pi}\right) = \beta_0 + \beta_1 x$: Die Log-Odds der
+Remission hängen linear von der Anzahl Sitzungen $x$ ab. Der Achsenabschnitt
+$\beta_0$ gibt die Log-Odds bei 0 Sitzungen an, die Steigung $\beta_1$ ihre
+Zunahme pro Sitzung. Die Ausgangswerte $\beta_0 = `r b0`$ und
+$\beta_1 = `r b1`$ sind die Werte, aus denen die Daten simuliert wurden.
+
+```{r explorer-data}
+#| echo: false
+#| results: asis
+d <- read.csv("data/remission.csv")
+cat("<script>window.remissionData = ",
+    jsonlite::toJSON(d[, c("sitzungen", "remission")]),
+    "; window.logitStart = ",
+    jsonlite::toJSON(list(b0 = b0, b1 = b1), auto_unbox = TRUE),
+    ";</script>", sep = "")
+```
+
+```{=html}
+<div class="ex-widget">
+  <div class="ex-controls">
+    <label for="ex-b0">Achsenabschnitt β₀</label>
+    <input type="range" id="ex-b0" min="-8" max="4" step="0.1">
+    <input type="number" id="ex-b0-num" min="-8" max="4" step="0.1" aria-label="Achsenabschnitt β₀ als Zahl">
+    <label for="ex-b1">Steigung β₁</label>
+    <input type="range" id="ex-b1" min="-0.3" max="0.6" step="0.01">
+    <input type="number" id="ex-b1-num" min="-0.3" max="0.6" step="0.01" aria-label="Steigung β₁ als Zahl">
+    <label for="ex-x">Sitzungen x (Ablesestelle)</label>
+    <input type="range" id="ex-x" min="0" max="40" step="1" value="10">
+    <input type="number" id="ex-x-num" min="0" max="40" step="1" value="10" aria-label="Sitzungen x als Zahl">
+  </div>
+  <div class="ex-options">
+    <label><input type="checkbox" id="ex-ref" checked> Ausgangskurve</label>
+    <label><input type="checkbox" id="ex-data" checked> Daten</label>
+    <button id="ex-reset" type="button" class="btn btn-sm btn-outline-secondary">Zurücksetzen</button>
+  </div>
+  <svg id="ex-svg" viewBox="0 0 900 420" role="img"
+       aria-label="S-Kurve der logistischen Regression: Wahrscheinlichkeit einer Remission gegen Anzahl Sitzungen"></svg>
+  <p class="ex-legend"><span class="gruen">grün</span>: Kurve mit den eingestellten Parametern ·
+    <span class="blau">blau gestrichelt</span>: Ausgangskurve ·
+    <span class="orange">orange</span>: Ablesestelle x · Punkte: simulierte Daten (0 = keine Remission, 1 = Remission)</p>
+  <div class="ex-steps" aria-live="polite">
+    <span>Log-Odds bei x = <b id="ex-x-label"></b>: β₀ + β₁ · x</span><span class="ex-val" id="ex-step-lo"></span>
+    <span>Odds: e hoch Log-Odds</span><span class="ex-val" id="ex-step-od"></span>
+    <span>Wahrscheinlichkeit π: Odds / (1 + Odds)</span><span class="ex-val" id="ex-step-pi"></span>
+  </div>
+</div>
+<script src="explorer.js"></script>
+```
+
+Die Regler und die Zahlenfelder sind gekoppelt: Mit den Zahlenfeldern lassen
+sich genaue Werte eintippen. Die gestrichelte grüne Linie zeigt, bei wie vielen
+Sitzungen $\pi = .5$ ist, also Remission genau so wahrscheinlich wie keine.
+
+## Übungsfragen
+
+Die Fragen bauen aufeinander auf. Mit ✓ prüfen Sie Ihre Antwort, mit ? sehen
+Sie die Lösung und eine kurze Erklärung. Zahlen geben Sie mit Punkt als
+Dezimalzeichen und mit führender Null ein (0.42), auch wenn
+Wahrscheinlichkeiten in den Texten nach APA-Stil ohne Null stehen (.42).
+So sehen auch die Online-Übungen zur Vorlesung aus.
+
+```{r uebungen}
+#| echo: false
+#| message: false
+#| results: asis
+titel <- c(
+  u01_pi_halb.Rmd           = "Wann ist Remission so wahrscheinlich wie keine?",
+  u02_pi_bei_10.Rmd         = "Wahrscheinlichkeit nach 10 Sitzungen",
+  u03_odds_bei_30.Rmd       = "Odds nach 30 Sitzungen",
+  u04_beta1_verdoppeln.Rmd  = "Eine schneller wirkende Therapie: die Steigung verdoppeln",
+  u05_beta0_aendern.Rmd     = "Den Achsenabschnitt verändern",
+  u06_beta1_null.Rmd        = "Keine Steigung",
+  u07_beta1_negativ.Rmd     = "Negative Steigung: mehr Sitzungen, seltener Remission",
+  u08_parameter_finden.Rmd  = "Parameter für eine gesuchte Kurve",
+  u09_odds_faktor.Rmd       = "Ausblick: Um welchen Faktor wachsen die Odds?"
+)
+for (i in seq_along(titel)) {
+  cat("\n\n### Frage ", i, ": ", titel[[i]], "\n\n", sep = "")
+  exams2forms(file.path("uebungen", names(titel)[i]))
+}
+```
