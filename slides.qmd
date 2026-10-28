@@ -8,11 +8,7 @@ lang: de
 title-notes: |
   Willkommen zu dieser kurzen Vorlesung zur logistischen Regression.
 
-  Viele Fragen in der Psychologie haben nur zwei mögliche Antworten: Ist jemand nach einer Therapie remittiert oder nicht? Hat jemand eine Prüfung bestanden oder nicht?
-
-  Heute sprechen wir darüber, warum wir für eine abhängige Variable mit nur zwei Ausprägungen ein paar Dinge an unserem statistischen Modell ändern müssen, damit wir aus solchen Daten korrekte Schlüsse ziehen.
-
-  Bevor wir anfangen: Scannen Sie gern schon den QR-Code, wir brauchen ihn gleich für ein kurzes Live-Quiz.
+  Wer beim Live-Quiz mitmachen will: Scannen Sie jetzt den QR-Code, es braucht kein Login. Wir brauchen ihn gleich.
 klicker-join-url: "https://pwa.klicker.uzh.ch/de/session/0d4d13f4-e434-41d8-b857-917a802e1068"
 format:
   revealjs:
@@ -133,13 +129,11 @@ Koeffizienten als Odds Ratios interpretieren, Schätzung, `glm(family = binomial
 :::
 
 ::: {.notes}
-In der letzten Sitzung haben wir die lineare Regression als statistisches Modell kennengelernt: eine Normalverteilung, deren Mittelwert von x abhängt.
+In der letzten Sitzung hatten wir die lineare Regression als Modell: eine Normalverteilung, deren Mittelwert von x abhängt.
 
-Nach diesem Abschnitt schauen wir uns an, wie man die Koeffizienten als Odds Ratios interpretiert und das Modell in R schätzt.
+▸ Danach kommen die Koeffizienten als Odds Ratios, die Schätzung und glm() in R.
 
-Und dazwischen: heute. Was ändert sich, wenn die abhängige Variable nur 0 oder 1 sein kann?
-
-Dazu ein Beispiel.
+▸ Und dazwischen liegt heute: Was ändert sich, wenn die abhängige Variable nur 0 oder 1 sein kann? Dazu ein Beispiel.
 :::
 
 ## Das Beispiel: Remission nach Psychotherapie {.remission}
@@ -164,11 +158,11 @@ Eine Diagnose ist erfüllt oder nicht. Deshalb ist **Remission binär**: 0 oder 
 :::
 
 ::: {.notes}
-Unser Beispiel: `r n_total` Patient:innen nach einer Psychotherapie, zwischen `r x_lo` und `r x_hi` Sitzungen. Die Frage: Wer remittiert? Remission heisst, die Diagnosekriterien sind nicht mehr erfüllt.
+Unser Beispiel: `r n_total` Patient:innen nach einer Psychotherapie, mit `r x_lo` bis `r x_hi` Sitzungen; die Daten sind simuliert. Die Frage ist: Wer ist remittiert? Remission heisst: Die Diagnosekriterien sind nicht mehr erfüllt.
 
-Kriterien noch erfüllt: 0. Nicht mehr erfüllt: 1.
+Links sind die Kriterien weiter erfüllt, also keine Remission. Das ist eine 0. Rechts sind die Kriterien nicht mehr erfüllt, also remittiert. Das ist eine 1.
 
-Eine Diagnose ist ein Ja/Nein-Urteil. Deshalb ist unsere abhängige Variable binär.
+▸ Eine Diagnose ist erfüllt oder nicht, dazwischen gibt es nichts. Deshalb ist unsere **abhängige** Variable binär.
 :::
 
 ## Ihre Intuition ist gefragt {.intuition}
@@ -196,11 +190,19 @@ join_box(130)
 ::::
 
 ::: {.notes}
-Schätzen Sie, ohne zu rechnen, 30 Sekunden. Wer noch nicht drin ist: QR rechts.
+So sehen die Daten aus: bei wenigen Sitzungen fast nur Nullen, bei vielen fast nur Einsen.
 
-Unter der Frage sehen Sie zwei Regler, Tempo und Schwierigkeit. Verschieben Sie die, wann immer Sie wollen, ich schaue nachher drauf.
+[Klicker Block 1 öffnen]
 
-Fast alle sagen B. Schauen wir, wie schlimm es ist.
+Rechts steht die Frage. Schätzen Sie, ohne zu rechnen, 30 Sekunden. Wer noch nicht drin ist: QR-Code rechts.
+
+[Countdown 35 s, der Block schliesst sich selbst. Nach 1:55 noch offen: Block schliessen. Klicker tot: Handzeichen A, B, C]
+
+[Ergebnis auf dem Handy ablesen, nicht projizieren]
+
+- *Meist B:* Die meisten sagen B: Die Gerade verlässt den Bereich von 0 bis 1. Schauen wir, wie weit.
+- *Gespalten:* Sie sind sich nicht einig. Gut, dann schauen wir nach.
+- *Meist A oder C:* Die meisten sagen A (oder: C). Schauen wir, ob R das auch so sieht.
 :::
 
 ## Was passiert mit der Geraden? {.nostretch}
@@ -242,17 +244,15 @@ R rechnet jedes Modell, das Sie angeben. **Welches Modell passt, entscheiden Sie
 :::
 
 ::: {.notes}
-Schauen wir nach.
+Hier noch einmal die Daten, noch ohne Gerade.
 
-Das ist der Befehl aus der letzten Sitzung. R rechnet das klaglos, keine Warnung, keine Fehlermeldung.
+▸ Rechts der Befehl aus der letzten Sitzung. R rechnet das klaglos: keine Warnung, keine Fehlermeldung. Antwort C fällt also weg. Links sehen Sie die Gerade dazu.
 
-Wahrscheinlichkeiten gibt es nur zwischen 0 und 1.
+▸ Orange sind die Bereiche unter 0 und über 1. Wahrscheinlichkeiten gibt es nur zwischen 0 und 1.
 
-Bei `r x_hi` Sitzungen sagt die Gerade `r f2(pred_hi)` vorher, eine Wahrscheinlichkeit von `r pct(pred_hi)`. Die Gerade weiss nicht, dass es eine Wahrscheinlichkeit beschreiben soll.
+▸ Bei `r x_hi` Sitzungen sagt die Gerade `r f2(pred_hi)` vorher, eine Wahrscheinlichkeit von `r pct(pred_hi)`. Bei `r x_lo` Sitzung sagt sie `r f2(pred_lo)`. `r n_out` von `r n_total` vorhergesagten Werten liegen ausserhalb von 0 bis 1. Das ist Antwort B.
 
-R prüft nicht, ob das Modell zu Ihrer abhängigen Variable passt. Diese Entscheidung nimmt Ihnen kein Programm ab, die treffen Sie.
-
-Das Problem liegt nicht in der Geraden, sondern im Modell dahinter. Dafür gehen wir einen Schritt zurück.
+▸ R prüft nicht, ob das Modell zu Ihrer abhängigen Variable passt. Welches Modell passt, entscheiden Sie. Das Problem liegt also nicht in der Geraden, sondern im Modell dahinter. Dafür gehen wir einen Schritt zurück.
 :::
 
 ## Jede Regression beruht auf einer Verteilungsannahme {.nostretch .verteilung}
@@ -289,19 +289,17 @@ Gleiche Struktur: eine **Verteilung** und ein **Parameter, der von $x$ abhängt*
 :::
 
 ::: {.notes}
-Jede Person hat ihre eigene Normalverteilung; der Mittelwert μᵢ liegt auf der Geraden.
+Jede Regression beruht auf einer Verteilungsannahme. Links die lineare Regression: Jede Person hat ihre eigene Normalverteilung, und deren Mittelwert μᵢ liegt auf der Geraden.
 
-Eine Normalverteilung verteilt Wahrscheinlichkeit auf alle Werte, auch auf 0.3 oder 1.4. Y kennt nur 0 und 1. Die Binomialverteilung aus Statistik I, B(n, π), ist genau die Verteilung einer 0/1-Variable; hier ziehen wir pro Person genau einmal: n = 1. Nichts anderes passt zu dieser abhängigen Variable.
+▸ Eine Normalverteilung verteilt Wahrscheinlichkeit auf alle Werte, auch auf 0.3 oder 1.4. Y kennt aber nur 0 und 1. Die Verteilung einer 0/1-Variable kennen Sie aus Statistik I: die Binomialverteilung. Wir ziehen pro Person genau einmal, also n gleich 1. Nichts anderes passt zu dieser abhängigen Variable.
 
-Bei 5 Sitzungen meist 0, bei 35 meist 1.
+▸ Die Balken zeigen die Wahrscheinlichkeit für 0 und für 1. Mit wenigen Sitzungen meist 0, mit vielen Sitzungen meist 1.
 
-Ob eine einzelne Person remittiert, ist 0 oder 1, das sagt kein Modell sicher vorher. Was von den Sitzungen abhängt, ist, wie häufig Remission vorkommt. Der Kreis πᵢ ist der Mittelwert der 0/1-Werte, also der Anteil Remissionen unter Personen mit xᵢ Sitzungen. In unseren Daten: bei `r x_anteil - 2` bis `r x_anteil + 2` Sitzungen `r k_fenster` von `r n_fenster`, das Modell sagt `r fmt_pi(pi_anteil)`. Die beobachtete Häufigkeit streut um π.
+▸ Der Kreis ist πᵢ, die Wahrscheinlichkeit für eine 1. Ob eine einzelne Person remittiert, sagt kein Modell sicher vorher. Von den Sitzungen hängt ab, wie häufig Remission vorkommt: πᵢ ist der Anteil Remissionen bei gleich vielen Sitzungen. In unseren Daten, bei `r x_anteil - 2` bis `r x_anteil + 2` Sitzungen: `r k_fenster` von `r n_fenster`; das Modell sagt `r sub("^\\.", "Punkt ", fmt_pi(pi_anteil))`. Was liegt nahe für πᵢ?
 
-Was liegt nahe für πᵢ?
+[kurz warten; erwartet: «die Gerade, wie links»]
 
-Links sagt die Regression μᵢ vorher, nicht den Wert jeder Person; rechts genauso πᵢ, nicht die 0 oder 1.
-
-Die Gerade auf Folie 5 hat genau das getan: πᵢ direkt auf die Gerade gesetzt. Und das ging schief. Warum? Nächste Folie.
+▸ Gleiche Struktur: eine Verteilung und ein Parameter, der von x abhängt. Links sagt die Regression μᵢ vorher, nicht den Wert jeder Person; rechts genauso πᵢ, nicht die 0 oder 1. Die Gerade auf Folie 5 hat πᵢ direkt auf die Gerade gesetzt, und das ging schief. Warum? Nächste Folie.
 :::
 
 ## Das Problem: der Wertebereich
@@ -329,13 +327,23 @@ $.8 / .2 = `r odds_80`$: Auf `r odds_80` Remissionen kommt eine Nicht-Remission.
 :::
 
 ::: {.notes}
-Was ist der kleinste, was der grösste Wert?
+Das Problem ist der Wertebereich: π liegt zwischen 0 und 1, die Gerade kann jeden Wert annehmen. Wir brauchen also eine Umrechnung.
 
-Orange ist π = 0: Odds 0, Log-Odds minus unendlich. Grün ist π = .5: Odds 1, Log-Odds 0. Lila ist π = 1: unendlich.
+▸ Erste Zeile: die Wahrscheinlichkeit, von 0 bis 1. Die Farben: Orange ist π = 0, grün ist π = Punkt 5, lila ist π = 1.
 
-Das ist der Umweg: Log-Odds decken den ganzen Zahlenstrahl ab, genau wie β₀ + β₁x. Nur die darf man gleichsetzen. Andere Umrechnungen mit dieser Eigenschaft gäbe es; wir nehmen die Odds, weil Sie sie kennen und weil β₁ nächste Sitzung ein Odds Ratio wird.
+▸ Zweite Zeile: die Odds, die Wahrscheinlichkeit **geteilt durch** die Gegenwahrscheinlichkeit, also π durch 1 minus π. Sie laufen von 0 bis unendlich: Orange bleibt bei 0, grün wird 1, lila geht nach unendlich. Nach oben ist die Grenze weg, nach unten nicht.
 
-.2 und .8 liegen symmetrisch um 0.
+▸ Dritte Zeile: Wir nehmen den Logarithmus der Odds, die Log-Odds. Was ist hier der kleinste, was der grösste Wert?
+
+[kurz warten]
+
+Minus unendlich und plus unendlich: Orange wandert nach minus unendlich, grün liegt bei 0, lila bei plus unendlich. Das ist der Umweg: Log-Odds decken den ganzen Zahlenstrahl ab, genau wie β₀ plus β₁ x. Nur die darf man gleichsetzen. Andere Umrechnungen mit dieser Eigenschaft gäbe es; wir nehmen die Odds, weil Sie sie kennen und weil β₁ nächste Sitzung ein Odds Ratio wird.
+
+▸ Eine Denkpause: Wenn π Punkt 80 ist, wie gross sind die Odds?
+
+[15 s warten]
+
+▸ Punkt 80 durch Punkt 20 ist `r odds_80`. Auf `r odds_80` Remissionen kommt eine Nicht-Remission. Das kennen Sie aus dem Bayes-Beispiel in Statistik I. Auf der Log-Odds-Skala liegen Punkt 20 und Punkt 80 symmetrisch um 0.
 :::
 
 ## Das logistische Regressionsmodell
@@ -405,21 +413,23 @@ $$
 ::::
 
 ::: {.notes}
-Das Wort dafür steht auf der Folie: Logit.
+Zurück zum Modell. Oben steht wie vorhin: Remission folgt der Binomialverteilung mit dem Parameter πᵢ. Offen ist: Was setzen wir für πᵢ ein?
 
-e hoch macht ln rückgängig: aus Log-Odds werden Odds.
+▸ Nicht πᵢ selbst, sondern seine Log-Odds setzen wir gleich der linearen Gleichung. Die Log-Odds heissen auch Logit, das Wort steht unter der Klammer.
 
-Odds durch 1 plus Odds: die Wahrscheinlichkeit, wie im Bayes-Beispiel.
+▸ Zurück zur Wahrscheinlichkeit geht es in zwei Schritten. Erstens: e hoch macht den Logarithmus rückgängig, aus Log-Odds werden Odds.
 
-Die S-Kurve bleibt zwischen 0 und 1, egal wie viele Sitzungen. Sie heisst logistische Funktion, daher der Name der Methode. Rechnen wir eine Stelle durch.
+▸ Zweitens: Odds durch 1 plus Odds ergibt die Wahrscheinlichkeit, wie im Bayes-Beispiel.
 
-Minus 3 plus 0.15 mal 20 ist 0. Das sind die Log-Odds.
+▸ Das ist die Kurve dazu. Sie bleibt zwischen 0 und 1, egal wie viele Sitzungen. Sie heisst logistische Funktion, daher der Name der Methode. Rechnen wir eine Stelle durch: `r x_mid` Sitzungen.
 
-e hoch 0 ist 1.
+▸ `r fnum(beta0)` plus `r beta1` mal `r x_mid` ist `r lo_mid`. Das sind die Log-Odds.
 
-1 durch 2 ist .5, hier, bei `r x_mid` Sitzungen.
+▸ e hoch `r lo_mid` ist `r odds_mid`. Das sind die Odds.
 
-Kurzer Blick auf Ihre Regler: Tempo …, Schwierigkeit … .
+▸ `r odds_mid` durch 1 plus `r odds_mid` ist `r sub("^\\.", "Punkt ", fpi(plogis(lo_mid)))`. Bei `r x_mid` Sitzungen ist π also `r sub("^\\.", "Punkt ", fpi(plogis(lo_mid)))`, hier der Punkt auf der Kurve.
+
+[Uhr, Soll 7:20. Nach 8:40 noch hier: Folie 9 nur Frage und Animieren, dann G 11 Enter. Nach 9:00 noch hier: sofort G 11 Enter]
 :::
 
 ## Gedankenexperiment: schneller wirkende Therapie {.nostretch}
@@ -561,9 +571,17 @@ cat("<script>window.remissionData = ",
 ```
 
 ::: {.notes}
-β₁ von 0.15 auf 0.30. Bei der alten Kurve ist π = .5 bei `r x_mid` Sitzungen. Bei doppeltem β₁: bei wie vielen? Kurz mit Ihrem Nebenan.
+[Kürzungspunkt A: Ankunft nach 7:40, dann ohne Nebenan-Frage direkt Animieren]
 
-Steiler, und der Punkt π = .5 wandert von `r x_mid` auf `r x_mid2`, halbe Strecke, weil π = .5 bei x = −β₀/β₁. In diesen Daten ist Remission dann schon nach `r x_mid2` Sitzungen so wahrscheinlich wie keine. Die Steigung beschreibt den Zusammenhang in den Daten; ob die Sitzungen die Remission bewirken, sagt sie nicht.
+Eine Therapie wirkt schneller: β₁ verdoppelt sich, von `r beta1` auf `r f2(2 * beta1)`. Bei der alten Kurve liegt π = Punkt 5 bei `r x_mid` Sitzungen. Bei wie vielen Sitzungen liegt dieser Punkt, wenn β₁ doppelt so gross ist? Kurz mit Ihrem Nebenan.
+
+[10 s warten, dann Animieren]
+
+Steiler, und π = Punkt 5 wandert von `r x_mid` auf `r x_mid2` Sitzungen, an der grünen Linie. Das ist die halbe Strecke, weil π = Punkt 5 bei minus β₀ durch β₁ liegt. Die Steigung beschreibt den Zusammenhang in diesen Daten; ob die Sitzungen die Remission bewirken, sagt sie nicht.
+
+[Nur falls gefragt: bei `r x_mid` Sitzungen ist π jetzt `r sub("^\\.", "Punkt ", fpi(plogis(beta0 + 2 * beta1 * x_mid)))`. Sonst keine weiteren Zahlen]
+
+[Uhr: fertig bis 8:15, Selbsttest voll. 8:15 bis 8:40, Selbsttest kurz. Nach 8:40: G 11 Enter]
 :::
 
 ## Selbst-Check: Was haben Sie behalten? {.selbsttest}
@@ -591,15 +609,25 @@ join_box(130, "40 Sekunden")
 ::::
 
 ::: {.notes}
-Zum Schluss prüfen Sie selbst: vier Aussagen, richtig oder falsch, 40 Sekunden.
+[Klicker Block 2 öffnen]
 
-A richtig: Ein Parameter pro Person, aber er hängt nur von x ab, wie μᵢ in der linearen Regression. Verschieden ist nur noch der Ausgang Y.
+Zum Schluss prüfen Sie selbst: vier Aussagen, je richtig oder falsch. 40 Sekunden.
 
-B falsch: Linear sind die Log-Odds. π folgt der S-Kurve und bleibt zwischen 0 und 1.
+[warten, nicht kommentieren. Der Block schliesst nach 40 s; stehen die Balken früher: Block schliessen]
 
-C richtig: `r odds_check` durch 1 plus `r odds_check` ist `r fmt_pi(pi_check)`: drei Remissionen auf eine Nicht-Remission.
+[Fenster: Ctrl+Tab zur Auswertung, Lösung einblenden. Ein Balken auffällig falsch: diesen Satz zuerst]
 
-D falsch: Log-Odds laufen von minus bis plus unendlich; unter π = .5 sind sie negativ. Genau deshalb darf hier eine Gerade stehen.
+A ist richtig. Ein Parameter pro Person, aber er hängt nur von x ab, wie μᵢ in der linearen Regression. Verschieden ist nur noch der Ausgang Y.
+
+B ist falsch. Linear sind die Log-Odds. π folgt der S-Kurve und bleibt zwischen 0 und 1.
+
+C ist richtig. `r odds_check` durch 1 plus `r odds_check` ist `r sub("^\\.", "Punkt ", fmt_pi(pi_check))`: `r odds_check` Remissionen auf eine Nicht-Remission.
+
+D ist falsch. Log-Odds laufen von minus bis plus unendlich; unter π = Punkt 5 sind sie negativ. Genau deshalb darf hier eine Gerade stehen.
+
+[Kurz, bei 8:15 bis 8:40: Block nach 25 s schliessen, dann zwei Sätze. «A richtig, B falsch: πᵢ hängt nur von x ab, aber nicht linear; linear sind die Log-Odds.» «C richtig, D falsch: `r odds_check` durch 1 plus `r odds_check` ist `r sub("^\\.", "Punkt ", fmt_pi(pi_check))`, und Log-Odds laufen von minus bis plus unendlich.»]
+
+[Fenster: Ctrl+Tab zurück zu den Folien]
 :::
 
 ## Mitnehmen
@@ -637,7 +665,9 @@ if (requireNamespace("qrcode", quietly = TRUE)) {
 ::: {.notes}
 Das sind die zwei Sätze zum Mitnehmen.
 
-Als Nächstes: was β₁ = 0.15 heisst, Odds Ratios, dann glm() in R. Material und Daten unter dem Link.
+[Ohne Selbsttest, nach G 11 Enter, stattdessen: «Wir behalten die Struktur des Modells, tauschen die Verteilung aus und transformieren den Parameter so, dass der lineare Teil passt.»]
+
+▸ Als Nächstes: was β₁ = `r beta1` heisst, also Odds Ratios, und glm() in R. Material und Daten finden Sie unter dem Link. Vielen Dank.
 :::
 
 # Backup {#bk-index .section-divider background-color="#12355b" visibility="uncounted"}

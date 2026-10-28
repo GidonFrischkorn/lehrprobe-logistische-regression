@@ -208,9 +208,7 @@
     <span>Live-Quiz beitreten</span>
   </div>
   <aside class="notes"><p>Willkommen zu dieser kurzen Vorlesung zur logistischen Regression.</p>
-<p>Viele Fragen in der Psychologie haben nur zwei mögliche Antworten: Ist jemand nach einer Therapie remittiert oder nicht? Hat jemand eine Prüfung bestanden oder nicht?</p>
-<p>Heute sprechen wir darüber, warum wir für eine abhängige Variable mit nur zwei Ausprägungen ein paar Dinge an unserem statistischen Modell ändern müssen, damit wir aus solchen Daten korrekte Schlüsse ziehen.</p>
-<p>Bevor wir anfangen: Scannen Sie gern schon den QR-Code, wir brauchen ihn gleich für ein kurzes Live-Quiz.</p><style type="text/css">
+<p>Wer beim Live-Quiz mitmachen will: Scannen Sie jetzt den QR-Code, es braucht kein Login. Wir brauchen ihn gleich.</p><style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
           clip: rect(1px, 1px, 1px, 1px);
@@ -243,10 +241,9 @@
 </div>
 </div>
 <aside class="notes">
-<p>In der letzten Sitzung haben wir die lineare Regression als statistisches Modell kennengelernt: eine Normalverteilung, deren Mittelwert von x abhängt.</p>
-<p>Nach diesem Abschnitt schauen wir uns an, wie man die Koeffizienten als Odds Ratios interpretiert und das Modell in R schätzt.</p>
-<p>Und dazwischen: heute. Was ändert sich, wenn die abhängige Variable nur 0 oder 1 sein kann?</p>
-<p>Dazu ein Beispiel.</p>
+<p>In der letzten Sitzung hatten wir die lineare Regression als Modell: eine Normalverteilung, deren Mittelwert von x abhängt.</p>
+<p>▸ Danach kommen die Koeffizienten als Odds Ratios, die Schätzung und glm() in R.</p>
+<p>▸ Und dazwischen liegt heute: Was ändert sich, wenn die abhängige Variable nur 0 oder 1 sein kann? Dazu ein Beispiel.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -274,9 +271,9 @@
 <p>Eine Diagnose ist erfüllt oder nicht. Deshalb ist <strong>Remission binär</strong>: 0 oder 1.</p>
 </div>
 <aside class="notes">
-<p>Unser Beispiel: 200 Patient:innen nach einer Psychotherapie, zwischen 1 und 40 Sitzungen. Die Frage: Wer remittiert? Remission heisst, die Diagnosekriterien sind nicht mehr erfüllt.</p>
-<p>Kriterien noch erfüllt: 0. Nicht mehr erfüllt: 1.</p>
-<p>Eine Diagnose ist ein Ja/Nein-Urteil. Deshalb ist unsere abhängige Variable binär.</p>
+<p>Unser Beispiel: 200 Patient:innen nach einer Psychotherapie, mit 1 bis 40 Sitzungen; die Daten sind simuliert. Die Frage ist: Wer ist remittiert? Remission heisst: Die Diagnosekriterien sind nicht mehr erfüllt.</p>
+<p>Links sind die Kriterien weiter erfüllt, also keine Remission. Das ist eine 0. Rechts sind die Kriterien nicht mehr erfüllt, also remittiert. Das ist eine 1.</p>
+<p>▸ Eine Diagnose ist erfüllt oder nicht, dazwischen gibt es nichts. Deshalb ist unsere <strong>abhängige</strong> Variable binär.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -306,9 +303,16 @@
 </div>
 </div></div>
 <aside class="notes">
-<p>Schätzen Sie, ohne zu rechnen, 30 Sekunden. Wer noch nicht drin ist: QR rechts.</p>
-<p>Unter der Frage sehen Sie zwei Regler, Tempo und Schwierigkeit. Verschieben Sie die, wann immer Sie wollen, ich schaue nachher drauf.</p>
-<p>Fast alle sagen B. Schauen wir, wie schlimm es ist.</p>
+<p>So sehen die Daten aus: bei wenigen Sitzungen fast nur Nullen, bei vielen fast nur Einsen.</p>
+<p>[Klicker Block 1 öffnen]</p>
+<p>Rechts steht die Frage. Schätzen Sie, ohne zu rechnen, 30 Sekunden. Wer noch nicht drin ist: QR-Code rechts.</p>
+<p>[Countdown 35 s, der Block schliesst sich selbst. Nach 1:55 noch offen: Block schliessen. Klicker tot: Handzeichen A, B, C]</p>
+<p>[Ergebnis auf dem Handy ablesen, nicht projizieren]</p>
+<ul>
+<li><em>Meist B:</em> Die meisten sagen B: Die Gerade verlässt den Bereich von 0 bis 1. Schauen wir, wie weit.</li>
+<li><em>Gespalten:</em> Sie sind sich nicht einig. Gut, dann schauen wir nach.</li>
+<li><em>Meist A oder C:</em> Die meisten sagen A (oder: C). Schauen wir, ob R das auch so sieht.</li>
+</ul>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -350,12 +354,11 @@
 </ul>
 </div>
 <aside class="notes">
-<p>Schauen wir nach.</p>
-<p>Das ist der Befehl aus der letzten Sitzung. R rechnet das klaglos, keine Warnung, keine Fehlermeldung.</p>
-<p>Wahrscheinlichkeiten gibt es nur zwischen 0 und 1.</p>
-<p>Bei 40 Sitzungen sagt die Gerade 1.11 vorher, eine Wahrscheinlichkeit von 111 %. Die Gerade weiss nicht, dass es eine Wahrscheinlichkeit beschreiben soll.</p>
-<p>R prüft nicht, ob das Modell zu Ihrer abhängigen Variable passt. Diese Entscheidung nimmt Ihnen kein Programm ab, die treffen Sie.</p>
-<p>Das Problem liegt nicht in der Geraden, sondern im Modell dahinter. Dafür gehen wir einen Schritt zurück.</p>
+<p>Hier noch einmal die Daten, noch ohne Gerade.</p>
+<p>▸ Rechts der Befehl aus der letzten Sitzung. R rechnet das klaglos: keine Warnung, keine Fehlermeldung. Antwort C fällt also weg. Links sehen Sie die Gerade dazu.</p>
+<p>▸ Orange sind die Bereiche unter 0 und über 1. Wahrscheinlichkeiten gibt es nur zwischen 0 und 1.</p>
+<p>▸ Bei 40 Sitzungen sagt die Gerade 1.11 vorher, eine Wahrscheinlichkeit von 111 %. Bei 1 Sitzung sagt sie −0.04. 20 von 200 vorhergesagten Werten liegen ausserhalb von 0 bis 1. Das ist Antwort B.</p>
+<p>▸ R prüft nicht, ob das Modell zu Ihrer abhängigen Variable passt. Welches Modell passt, entscheiden Sie. Das Problem liegt also nicht in der Geraden, sondern im Modell dahinter. Dafür gehen wir einen Schritt zurück.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -391,13 +394,12 @@
 <p>Gleiche Struktur: eine <strong>Verteilung</strong> und ein <strong>Parameter, der von <span class="math inline">\(x\)</span> abhängt</strong>. Vorhergesagt wird dieser Parameter, nicht der einzelne Wert <span class="math inline">\(Y_i\)</span>.</p>
 </div>
 <aside class="notes">
-<p>Jede Person hat ihre eigene Normalverteilung; der Mittelwert μᵢ liegt auf der Geraden.</p>
-<p>Eine Normalverteilung verteilt Wahrscheinlichkeit auf alle Werte, auch auf 0.3 oder 1.4. Y kennt nur 0 und 1. Die Binomialverteilung aus Statistik I, B(n, π), ist genau die Verteilung einer 0/1-Variable; hier ziehen wir pro Person genau einmal: n = 1. Nichts anderes passt zu dieser abhängigen Variable.</p>
-<p>Bei 5 Sitzungen meist 0, bei 35 meist 1.</p>
-<p>Ob eine einzelne Person remittiert, ist 0 oder 1, das sagt kein Modell sicher vorher. Was von den Sitzungen abhängt, ist, wie häufig Remission vorkommt. Der Kreis πᵢ ist der Mittelwert der 0/1-Werte, also der Anteil Remissionen unter Personen mit xᵢ Sitzungen. In unseren Daten: bei 33 bis 37 Sitzungen 26 von 27, das Modell sagt .90. Die beobachtete Häufigkeit streut um π.</p>
-<p>Was liegt nahe für πᵢ?</p>
-<p>Links sagt die Regression μᵢ vorher, nicht den Wert jeder Person; rechts genauso πᵢ, nicht die 0 oder 1.</p>
-<p>Die Gerade auf Folie 5 hat genau das getan: πᵢ direkt auf die Gerade gesetzt. Und das ging schief. Warum? Nächste Folie.</p>
+<p>Jede Regression beruht auf einer Verteilungsannahme. Links die lineare Regression: Jede Person hat ihre eigene Normalverteilung, und deren Mittelwert μᵢ liegt auf der Geraden.</p>
+<p>▸ Eine Normalverteilung verteilt Wahrscheinlichkeit auf alle Werte, auch auf 0.3 oder 1.4. Y kennt aber nur 0 und 1. Die Verteilung einer 0/1-Variable kennen Sie aus Statistik I: die Binomialverteilung. Wir ziehen pro Person genau einmal, also n gleich 1. Nichts anderes passt zu dieser abhängigen Variable.</p>
+<p>▸ Die Balken zeigen die Wahrscheinlichkeit für 0 und für 1. Mit wenigen Sitzungen meist 0, mit vielen Sitzungen meist 1.</p>
+<p>▸ Der Kreis ist πᵢ, die Wahrscheinlichkeit für eine 1. Ob eine einzelne Person remittiert, sagt kein Modell sicher vorher. Von den Sitzungen hängt ab, wie häufig Remission vorkommt: πᵢ ist der Anteil Remissionen bei gleich vielen Sitzungen. In unseren Daten, bei 33 bis 37 Sitzungen: 26 von 27; das Modell sagt Punkt 90. Was liegt nahe für πᵢ?</p>
+<p>[kurz warten; erwartet: «die Gerade, wie links»]</p>
+<p>▸ Gleiche Struktur: eine Verteilung und ein Parameter, der von x abhängt. Links sagt die Regression μᵢ vorher, nicht den Wert jeder Person; rechts genauso πᵢ, nicht die 0 oder 1. Die Gerade auf Folie 5 hat πᵢ direkt auf die Gerade gesetzt, und das ging schief. Warum? Nächste Folie.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -445,10 +447,15 @@
 <p><span class="math inline">\(.8 / .2 = 4\)</span>: Auf 4 Remissionen kommt eine Nicht-Remission. Kennen Sie aus dem Bayes-Beispiel in Statistik I (Prior-Odds).</p>
 </div>
 <aside class="notes">
-<p>Was ist der kleinste, was der grösste Wert?</p>
-<p>Orange ist π = 0: Odds 0, Log-Odds minus unendlich. Grün ist π = .5: Odds 1, Log-Odds 0. Lila ist π = 1: unendlich.</p>
-<p>Das ist der Umweg: Log-Odds decken den ganzen Zahlenstrahl ab, genau wie β₀ + β₁x. Nur die darf man gleichsetzen. Andere Umrechnungen mit dieser Eigenschaft gäbe es; wir nehmen die Odds, weil Sie sie kennen und weil β₁ nächste Sitzung ein Odds Ratio wird.</p>
-<p>.2 und .8 liegen symmetrisch um 0.</p>
+<p>Das Problem ist der Wertebereich: π liegt zwischen 0 und 1, die Gerade kann jeden Wert annehmen. Wir brauchen also eine Umrechnung.</p>
+<p>▸ Erste Zeile: die Wahrscheinlichkeit, von 0 bis 1. Die Farben: Orange ist π = 0, grün ist π = Punkt 5, lila ist π = 1.</p>
+<p>▸ Zweite Zeile: die Odds, die Wahrscheinlichkeit <strong>geteilt durch</strong> die Gegenwahrscheinlichkeit, also π durch 1 minus π. Sie laufen von 0 bis unendlich: Orange bleibt bei 0, grün wird 1, lila geht nach unendlich. Nach oben ist die Grenze weg, nach unten nicht.</p>
+<p>▸ Dritte Zeile: Wir nehmen den Logarithmus der Odds, die Log-Odds. Was ist hier der kleinste, was der grösste Wert?</p>
+<p>[kurz warten]</p>
+<p>Minus unendlich und plus unendlich: Orange wandert nach minus unendlich, grün liegt bei 0, lila bei plus unendlich. Das ist der Umweg: Log-Odds decken den ganzen Zahlenstrahl ab, genau wie β₀ plus β₁ x. Nur die darf man gleichsetzen. Andere Umrechnungen mit dieser Eigenschaft gäbe es; wir nehmen die Odds, weil Sie sie kennen und weil β₁ nächste Sitzung ein Odds Ratio wird.</p>
+<p>▸ Eine Denkpause: Wenn π Punkt 80 ist, wie gross sind die Odds?</p>
+<p>[15 s warten]</p>
+<p>▸ Punkt 80 durch Punkt 20 ist 4. Auf 4 Remissionen kommt eine Nicht-Remission. Das kennen Sie aus dem Bayes-Beispiel in Statistik I. Auf der Log-Odds-Skala liegen Punkt 20 und Punkt 80 symmetrisch um 0.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -515,14 +522,15 @@
 </div>
 </div></div>
 <aside class="notes">
-<p>Das Wort dafür steht auf der Folie: Logit.</p>
-<p>e hoch macht ln rückgängig: aus Log-Odds werden Odds.</p>
-<p>Odds durch 1 plus Odds: die Wahrscheinlichkeit, wie im Bayes-Beispiel.</p>
-<p>Die S-Kurve bleibt zwischen 0 und 1, egal wie viele Sitzungen. Sie heisst logistische Funktion, daher der Name der Methode. Rechnen wir eine Stelle durch.</p>
-<p>Minus 3 plus 0.15 mal 20 ist 0. Das sind die Log-Odds.</p>
-<p>e hoch 0 ist 1.</p>
-<p>1 durch 2 ist .5, hier, bei 20 Sitzungen.</p>
-<p>Kurzer Blick auf Ihre Regler: Tempo …, Schwierigkeit … .</p>
+<p>Zurück zum Modell. Oben steht wie vorhin: Remission folgt der Binomialverteilung mit dem Parameter πᵢ. Offen ist: Was setzen wir für πᵢ ein?</p>
+<p>▸ Nicht πᵢ selbst, sondern seine Log-Odds setzen wir gleich der linearen Gleichung. Die Log-Odds heissen auch Logit, das Wort steht unter der Klammer.</p>
+<p>▸ Zurück zur Wahrscheinlichkeit geht es in zwei Schritten. Erstens: e hoch macht den Logarithmus rückgängig, aus Log-Odds werden Odds.</p>
+<p>▸ Zweitens: Odds durch 1 plus Odds ergibt die Wahrscheinlichkeit, wie im Bayes-Beispiel.</p>
+<p>▸ Das ist die Kurve dazu. Sie bleibt zwischen 0 und 1, egal wie viele Sitzungen. Sie heisst logistische Funktion, daher der Name der Methode. Rechnen wir eine Stelle durch: 20 Sitzungen.</p>
+<p>▸ −3 plus 0.15 mal 20 ist 0. Das sind die Log-Odds.</p>
+<p>▸ e hoch 0 ist 1. Das sind die Odds.</p>
+<p>▸ 1 durch 1 plus 1 ist Punkt 5. Bei 20 Sitzungen ist π also Punkt 5, hier der Punkt auf der Kurve.</p>
+<p>[Uhr, Soll 7:20. Nach 8:40 noch hier: Folie 9 nur Frage und Animieren, dann G 11 Enter. Nach 9:00 noch hier: sofort G 11 Enter]</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -661,8 +669,12 @@
 })();
 </script>
 <aside class="notes">
-<p>β₁ von 0.15 auf 0.30. Bei der alten Kurve ist π = .5 bei 20 Sitzungen. Bei doppeltem β₁: bei wie vielen? Kurz mit Ihrem Nebenan.</p>
-<p>Steiler, und der Punkt π = .5 wandert von 20 auf 10, halbe Strecke, weil π = .5 bei x = −β₀/β₁. In diesen Daten ist Remission dann schon nach 10 Sitzungen so wahrscheinlich wie keine. Die Steigung beschreibt den Zusammenhang in den Daten; ob die Sitzungen die Remission bewirken, sagt sie nicht.</p>
+<p>[Kürzungspunkt A: Ankunft nach 7:40, dann ohne Nebenan-Frage direkt Animieren]</p>
+<p>Eine Therapie wirkt schneller: β₁ verdoppelt sich, von 0.15 auf 0.30. Bei der alten Kurve liegt π = Punkt 5 bei 20 Sitzungen. Bei wie vielen Sitzungen liegt dieser Punkt, wenn β₁ doppelt so gross ist? Kurz mit Ihrem Nebenan.</p>
+<p>[10 s warten, dann Animieren]</p>
+<p>Steiler, und π = Punkt 5 wandert von 20 auf 10 Sitzungen, an der grünen Linie. Das ist die halbe Strecke, weil π = Punkt 5 bei minus β₀ durch β₁ liegt. Die Steigung beschreibt den Zusammenhang in diesen Daten; ob die Sitzungen die Remission bewirken, sagt sie nicht.</p>
+<p>[Nur falls gefragt: bei 20 Sitzungen ist π jetzt Punkt 95. Sonst keine weiteren Zahlen]</p>
+<p>[Uhr: fertig bis 8:15, Selbsttest voll. 8:15 bis 8:40, Selbsttest kurz. Nach 8:40: G 11 Enter]</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -692,11 +704,16 @@
 </div>
 </div></div>
 <aside class="notes">
-<p>Zum Schluss prüfen Sie selbst: vier Aussagen, richtig oder falsch, 40 Sekunden.</p>
-<p>A richtig: Ein Parameter pro Person, aber er hängt nur von x ab, wie μᵢ in der linearen Regression. Verschieden ist nur noch der Ausgang Y.</p>
-<p>B falsch: Linear sind die Log-Odds. π folgt der S-Kurve und bleibt zwischen 0 und 1.</p>
-<p>C richtig: 3 durch 1 plus 3 ist .75: drei Remissionen auf eine Nicht-Remission.</p>
-<p>D falsch: Log-Odds laufen von minus bis plus unendlich; unter π = .5 sind sie negativ. Genau deshalb darf hier eine Gerade stehen.</p>
+<p>[Klicker Block 2 öffnen]</p>
+<p>Zum Schluss prüfen Sie selbst: vier Aussagen, je richtig oder falsch. 40 Sekunden.</p>
+<p>[warten, nicht kommentieren. Der Block schliesst nach 40 s; stehen die Balken früher: Block schliessen]</p>
+<p>[Fenster: Ctrl+Tab zur Auswertung, Lösung einblenden. Ein Balken auffällig falsch: diesen Satz zuerst]</p>
+<p>A ist richtig. Ein Parameter pro Person, aber er hängt nur von x ab, wie μᵢ in der linearen Regression. Verschieden ist nur noch der Ausgang Y.</p>
+<p>B ist falsch. Linear sind die Log-Odds. π folgt der S-Kurve und bleibt zwischen 0 und 1.</p>
+<p>C ist richtig. 3 durch 1 plus 3 ist Punkt 75: 3 Remissionen auf eine Nicht-Remission.</p>
+<p>D ist falsch. Log-Odds laufen von minus bis plus unendlich; unter π = Punkt 5 sind sie negativ. Genau deshalb darf hier eine Gerade stehen.</p>
+<p>[Kurz, bei 8:15 bis 8:40: Block nach 25 s schliessen, dann zwei Sätze. «A richtig, B falsch: πᵢ hängt nur von x ab, aber nicht linear; linear sind die Log-Odds.» «C richtig, D falsch: 3 durch 1 plus 3 ist Punkt 75, und Log-Odds laufen von minus bis plus unendlich.»]</p>
+<p>[Fenster: Ctrl+Tab zurück zu den Folien]</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -737,7 +754,8 @@
 </div></div>
 <aside class="notes">
 <p>Das sind die zwei Sätze zum Mitnehmen.</p>
-<p>Als Nächstes: was β₁ = 0.15 heisst, Odds Ratios, dann glm() in R. Material und Daten unter dem Link.</p>
+<p>[Ohne Selbsttest, nach G 11 Enter, stattdessen: «Wir behalten die Struktur des Modells, tauschen die Verteilung aus und transformieren den Parameter so, dass der lineare Teil passt.»]</p>
+<p>▸ Als Nächstes: was β₁ = 0.15 heisst, also Odds Ratios, und glm() in R. Material und Daten finden Sie unter dem Link. Vielen Dank.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
