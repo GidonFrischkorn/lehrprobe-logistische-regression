@@ -1,0 +1,33 @@
+```{r, include = FALSE}
+fmt <- function(x, d) formatC(x, format = "f", digits = d)
+b0 <- -3; b0_neu <- -1.5; b1 <- 0.15
+p0_neu <- plogis(b0_neu)
+```
+
+Question
+========
+Ausgangspunkt ist wieder $\beta_0 = `r b0`$, $\beta_1 = `r b1`$. Jetzt erhöhen Sie den Achsenabschnitt auf $\beta_0 = `r b0_neu`$ und lassen $\beta_1$ gleich.
+Welche Aussagen sind richtig?
+
+Answerlist
+----------
+* Die Kurve verschiebt sich nach links: Remission wird schon mit weniger Sitzungen wahrscheinlich.
+* Die Form der Kurve bleibt gleich, sie ist gleich steil wie vorher.
+* Die Stelle mit $\pi = .5$ liegt jetzt bei `r -b0_neu / b1` Sitzungen.
+* Bei 0 Sitzungen beträgt die Wahrscheinlichkeit einer Remission jetzt $\pi = .5$.
+
+Solution
+========
+Answerlist
+----------
+* Richtig. Ein grösseres $\beta_0$ erhöht die Log-Odds bei jeder Anzahl Sitzungen um denselben Betrag; die Kurve rutscht nach links.
+* Richtig. Die Steigung $\beta_1$ ist unverändert, deshalb bleibt die Form der S-Kurve gleich.
+* Richtig. $x = -\beta_0/\beta_1 = `r -b0_neu`/`r b1` = `r -b0_neu / b1`$.
+* Falsch. Bei 0 Sitzungen sind die Log-Odds $\beta_0 = `r b0_neu`$, das ergibt $\pi = `r fmt(p0_neu, 2)`$. Für $\pi = .5$ müssten die Log-Odds 0 sein.
+
+Meta-information
+================
+exname: beta0_aendern
+extype: mchoice
+exsolution: 1110
+exshuffle: TRUE

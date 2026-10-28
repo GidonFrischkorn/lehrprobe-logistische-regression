@@ -1,0 +1,32 @@
+```{r, include = FALSE}
+b1 <- 0.15; x_half <- 30
+b0_richtig <- -b1 * x_half
+```
+
+Question
+========
+Für eine andere Therapieform gilt: Remission ist nach `r x_half` Sitzungen genau so wahrscheinlich wie keine Remission ($\pi = .5$), und die Kurve ist **gleich steil** wie im Beispiel ($\beta_1 = `r b1`$).
+Welche Parameter beschreiben diese Kurve? Prüfen Sie die Kandidaten im Explorer.
+
+Answerlist
+----------
+* $\beta_0 = `r b0_richtig`$, $\beta_1 = `r b1`$
+* $\beta_0 = -3$, $\beta_1 = 0.10$
+* $\beta_0 = -3$, $\beta_1 = 0.30$
+* $\beta_0 = `r b0_richtig`$, $\beta_1 = 0.30$
+
+Solution
+========
+Answerlist
+----------
+* Richtig. Gleiche Steigung, und $-\beta_0/\beta_1 = `r -b0_richtig`/`r b1` = `r x_half`$.
+* Falsch. Auch hier liegt $\pi = .5$ bei $3/0.10 = 30$ Sitzungen, aber die Kurve ist flacher, weil $\beta_1$ kleiner ist.
+* Falsch. Hier liegt $\pi = .5$ schon bei $3/0.30 = 10$ Sitzungen.
+* Falsch. Hier liegt $\pi = .5$ bei $4.5/0.30 = 15$ Sitzungen, und die Kurve ist steiler.
+
+Meta-information
+================
+exname: parameter_finden
+extype: schoice
+exsolution: 1000
+exshuffle: TRUE

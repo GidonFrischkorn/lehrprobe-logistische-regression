@@ -1,0 +1,43 @@
+/* Explorer der logistischen Regression (Website) */
+.ex-widget {
+  border: 1px solid #d0d7de;
+  border-radius: 10px;
+  padding: 1rem;
+  margin: 1rem 0 1.5rem;
+}
+.ex-controls {
+  display: grid;
+  grid-template-columns: max-content 1fr 6.5em;
+  gap: 0.5rem 0.8rem;
+  align-items: center;
+}
+.ex-controls input[type="range"] { width: 100%; }
+.ex-controls input[type="number"] { width: 100%; }
+.ex-controls .ex-hint { font-size: 0.85em; color: #5a6470; }
+.ex-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  margin: 0.6rem 0 0.2rem;
+  font-size: 0.95em;
+}
+#ex-svg { width: 100%; height: auto; display: block; }
+.ex-steps {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.2rem 1rem;
+  background: #f6f8fa;
+  border-radius: 8px;
+  padding: 0.6rem 0.9rem;
+  font-variant-numeric: tabular-nums;
+}
+.ex-steps .ex-val { font-family: var(--bs-font-monospace, monospace); }
+.ex-legend { font-size: 0.85em; color: #5a6470; margin-top: 0.3rem; }
+.ex-legend .gruen { color: #009E73; font-weight: 600; }
+.ex-legend .blau { color: #0072B2; font-weight: 600; }
+.ex-legend .orange { color: #D55E00; font-weight: 600; }
+@media (max-width: 600px) {
+  .ex-controls { grid-template-columns: 1fr 5.5em; }
+  .ex-controls label { grid-column: 1 / -1; }
+}

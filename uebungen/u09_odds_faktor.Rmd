@@ -1,0 +1,27 @@
+```{r, include = FALSE}
+fmt <- function(x, d) formatC(x, format = "f", digits = d)
+b0 <- -3; b1 <- 0.15
+od20 <- exp(b0 + b1 * 20); od21 <- exp(b0 + b1 * 21)
+od10 <- exp(b0 + b1 * 10); od11 <- exp(b0 + b1 * 11)
+fac <- exp(b1)
+```
+
+Question
+========
+Ausblick auf die nächste Sitzung. Mit $\beta_0 = `r b0`$, $\beta_1 = `r b1`$: Lesen Sie im Explorer die Odds nach 20 und nach 21 Sitzungen ab.
+Mit welchem Faktor werden die Odds multipliziert, wenn eine Sitzung dazukommt? Zwei Nachkommastellen.
+
+Solution
+========
+Nach 20 Sitzungen: Odds $= `r fmt(od20, 3)`$; nach 21 Sitzungen: Odds $= `r fmt(od21, 3)`$. Der Faktor ist $`r fmt(od21, 3)`/`r fmt(od20, 3)` = `r fmt(fac, 2)`$.
+
+Probieren Sie es auch zwischen 10 und 11 Sitzungen: $`r fmt(od11, 3)`/`r fmt(od10, 3)` = `r fmt(od11 / od10, 2)`$, derselbe Faktor.
+Er ist immer $e^{\beta_1} = e^{`r b1`} = `r fmt(fac, 2)`$: Jede zusätzliche Sitzung multipliziert die Odds einer Remission mit `r fmt(fac, 2)`, also etwa +`r round(100 * (fac - 1))` %.
+Dieser Faktor heisst **Odds Ratio**; damit geht es in der nächsten Sitzung weiter.
+
+Meta-information
+================
+exname: odds_faktor
+extype: num
+exsolution: `r round(fac, 2)`
+extol: 0.01

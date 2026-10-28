@@ -1,0 +1,23 @@
+```{r, include = FALSE}
+fmt <- function(x, d) formatC(x, format = "f", digits = d)
+b0 <- -3; b1 <- 0.15; x <- 30
+lo <- b0 + b1 * x; od <- exp(lo); p <- od / (1 + od)
+```
+
+Question
+========
+Mit $\beta_0 = `r b0`$ und $\beta_1 = `r b1`$: Wie gross sind die **Odds** einer Remission nach $x = `r x`$ Sitzungen?
+Geben Sie das Ergebnis auf zwei Nachkommastellen an.
+
+Solution
+========
+Log-Odds: $`r b0` + `r b1` \cdot `r x` = `r fmt(lo, 2)`$. Odds: $e^{`r fmt(lo, 2)`} = `r fmt(od, 2)`$.
+
+In Worten: Nach 30 Sitzungen ist eine Remission etwa `r fmt(od, 1)`-mal so wahrscheinlich wie keine Remission. Die Wahrscheinlichkeit ist $\pi = `r fmt(od, 2)`/(1 + `r fmt(od, 2)`) = `r fmt(p, 2)`$.
+
+Meta-information
+================
+exname: odds_bei_30
+extype: num
+exsolution: `r round(od, 2)`
+extol: 0.05

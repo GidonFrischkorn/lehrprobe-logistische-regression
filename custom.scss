@@ -1,0 +1,570 @@
+/*-- scss:defaults --*/
+$body-bg: #ffffff;
+$body-color: #1f2328;
+$link-color: #0072B2;
+$presentation-heading-color: #12355b;
+$presentation-font-size-root: 34px;
+$presentation-heading-font-weight: 600;
+
+/*-- scss:rules --*/
+.reveal h2 {
+  font-size: 1.45em;
+  margin-bottom: 0.4em;
+}
+
+.reveal .slide-subtitle {
+  color: #5a6470;
+  font-size: 0.8em;
+}
+
+// Einordnung: wo steht der Ausschnitt in der Vorlesung
+.timeline {
+  display: flex;
+  gap: 0.6em;
+  margin-top: 1em;
+}
+.timeline > div {
+  flex: 1;
+  border: 2px solid #c9d1da;
+  border-radius: 10px;
+  padding: 0.5em 0.7em;
+  font-size: 0.85em;
+  color: #5a6470;
+}
+.timeline > div.now {
+  border-color: #0072B2;
+  background: #eaf3fa;
+  color: #1f2328;
+  font-weight: 600;
+}
+.timeline ul {
+  margin: 0 0 0 1em;
+  padding: 0;
+}
+.timeline li {
+  margin-bottom: 0.15em;
+}
+.timeline ul ul {
+  margin-top: 0.15em;
+  font-size: 0.95em;
+}
+.timeline .label {
+  display: block;
+  font-size: 0.8em;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.2em;
+}
+
+// Klicker-Frage und Denkpausen
+.klicker {
+  border-left: 8px solid #E69F00;
+  background: #fff6e0;
+  padding: 0.4em 0.8em;
+  border-radius: 6px;
+  font-size: 0.8em;
+}
+.denkpause {
+  border-left: 8px solid #E69F00;
+  background: #fff6e0;
+  padding: 0.3em 0.8em;
+  border-radius: 6px;
+}
+.merke {
+  border-left: 8px solid #0072B2;
+  background: #eaf3fa;
+  padding: 0.3em 0.8em;
+  border-radius: 6px;
+}
+
+.reveal .lm { color: #D55E00; font-weight: 600; }
+.reveal .logit { color: #0072B2; font-weight: 600; }
+
+table.leiter {
+  margin: 0.3em 0 0.5em 0;
+  border-collapse: collapse;
+  font-size: 0.95em;
+}
+table.leiter td {
+  padding: 0.15em 1.2em 0.15em 0;
+  border: none;
+  vertical-align: middle;
+}
+table.leiter td.range {
+  font-weight: 600;
+  color: #12355b;
+}
+
+// Slider-Widget
+.logit-widget svg {
+  display: block;
+  margin: 0 auto;
+  width: 100%;
+  height: 450px;
+}
+.logit-widget .slider-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1em;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7em;
+  margin-bottom: 0.2em;
+}
+// Folie 9: beide Knöpfe gemeinsam in einer eigenen Zeile unter den Reglern
+.logit-widget .slider-buttons {
+  flex-basis: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 1em;
+}
+.logit-widget input[type="range"] {
+  width: 220px;
+  vertical-align: middle;
+}
+.logit-widget button {
+  font-size: 0.9em;
+  padding: 0.1em 0.6em;
+}
+
+.small-note {
+  font-size: 0.6em;
+  color: #5a6470;
+}
+
+// Schrittweiser Aufbau (Fragmente)
+// Folie 7: Zahlenstrahl je Leiterzeile, gleiche Breite, damit 0 und 1 untereinander liegen
+table.leiter img.zahlenstrahl {
+  display: block;
+  width: 480px;
+  height: auto;
+  margin: 0;
+}
+// Folie 11: Merke-Punkt 2 erscheint als eigene Liste
+.merke ol {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
+}
+// Folie 5: Ebenen fest in der Höhe, damit der Text darunter über der Fusszeile bleibt
+.reveal .r-stack.layers > p {
+  margin: 0;
+  width: 100%;
+  text-align: center;
+}
+.reveal .r-stack.layers img {
+  height: 440px;
+  width: auto;
+  margin: 0;
+}
+// Folie 8: kompaktere Formeln in der linken Spalte
+.reveal .modell-links mjx-container[display="true"] {
+  margin: 0.3em 0 !important;
+}
+.reveal .modell-links p {
+  margin: 0.3em 0;
+}
+
+// Folie 8 rechts: Titel über der Abbildung, darunter die Kurve in zwei Ebenen
+// (erst ohne, dann mit grünem Punkt) und das schrittweise Rechenbeispiel.
+// Grössere Schrift als die Lesehilfen: die Umformungen sollen im Saal lesbar sein.
+.reveal .fig-titel {
+  display: block;
+  text-align: center;
+  font-size: 0.7em;
+  font-weight: 600;
+  margin: 0 0 0.15em;
+}
+.reveal .r-stack.s-kurve {
+  margin: 0;
+}
+.reveal .r-stack.s-kurve > *,
+// auch der Absatz innerhalb des Fragment-Wrappers: dessen Rand hätte die zweite
+// Ebene sonst um ~12 px nach unten versetzt, die Kurve wäre beim Einblenden gesprungen
+.reveal .r-stack.s-kurve p {
+  width: 100%;
+  margin: 0;
+}
+// max-height: none, weil reveal.js den Bildern 95% gibt: beim ersten Bild bezieht
+// sich das auf die vom Grid gestreckte Zelle, beim zweiten nicht — die Ebenen wären
+// dann unterschiedlich hoch und die Kurve beim Einblenden gesprungen.
+.reveal .r-stack.s-kurve img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: none;
+  margin: 0;
+}
+// Folie 6: Abbildungen ohne Absatzränder, damit die Merke-Box über der Fusszeile
+// bleibt; rechts dieselben zwei Regeln wie bei .s-kurve gegen springende Ebenen
+.reveal .verteilung .column p:has(> img),
+.reveal .verteilung .r-stack p {
+  width: 100%;
+  margin: 0.2em 0 0;
+}
+.reveal .verteilung .column img {
+  max-height: none;
+  margin: 0;
+}
+// Folie 6: knappere Abstände um Spaltentitel und Formeln, damit die zweizeilige
+// Merke-Box mit Abstand über der Fusszeile steht
+.reveal .verteilung .columns { margin-top: -0.3em; }
+.reveal .verteilung .column > p:first-child,
+.reveal .verteilung .column .fragment > p:first-child { margin: 0; }
+.reveal .verteilung mjx-container[display="true"] {
+  margin: 0.15em 0 !important;
+}
+.reveal .verteilung .merke {
+  font-size: 0.8em;
+  margin-top: 0.3em;
+}
+
+// Rechenbeispiel als nummerierte Schritte: Nummer, Grösse, Rechnung in drei Spalten
+.reveal .rechenbeispiel {
+  font-size: 0.72em;
+  line-height: 1.4;
+  background: #f4f6f8;
+  border-radius: 6px;
+  padding: 0.35em 0.8em 0.45em;
+  margin-top: 0.3em;
+}
+.reveal .rechenbeispiel p {
+  margin: 0.2em 0;
+}
+.reveal .rechenbeispiel .schritt p {
+  display: grid;
+  grid-template-columns: 1.6em 9.3em 1fr;
+  align-items: baseline;
+  margin: 0.25em 0 0;
+}
+.reveal .rechenbeispiel .nr {
+  display: inline-block;
+  width: 1.3em;
+  height: 1.3em;
+  line-height: 1.3em;
+  border-radius: 50%;
+  background: #0072B2;
+  color: #fff;
+  font-size: 0.85em;
+  font-weight: 700;
+  text-align: center;
+}
+.reveal .rechenbeispiel .was {
+  font-weight: 600;
+  color: #5a6470;
+}
+
+// KlickerUZH-Beitritt (QR + Link) auf Titelfolie, Folie 4 und Selbsttest
+.reveal .join-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2em;
+  font-size: 0.5em;
+  color: #5a6470;
+  text-align: center;
+  line-height: 1.25;
+  margin-top: 0.4em;
+}
+.reveal .join-box img {
+  margin: 0;
+  background: #fff;
+  padding: 8px;                 // Ruhezone: der KlickerUZH-QR hat keinen Rand
+  box-sizing: content-box;
+  image-rendering: pixelated;   // scharfe QR-Module bei jeder Skalierung
+}
+.reveal .join-box.join-missing {
+  border: 2px dashed #D55E00;
+  color: #D55E00;
+  padding: 0.5em;
+  font-size: 0.6em;
+}
+.reveal .join-title {
+  margin: 0.8em auto 0;
+}
+// Folie 10: Selbsttest, vier Aussagen wie in KlickerUZH
+.reveal .selbsttest .klicker {
+  font-size: 0.95em;
+}
+.reveal .selbsttest .klicker p {
+  margin: 0.45em 0;
+}
+.reveal .selbsttest h2 {
+  font-size: 1.25em;
+}
+
+// Lesehilfe: Notation in Worten (Folien 6 und 7). Sparsam halten: zu viel
+// Kleingedrucktes lenkt vom Vortrag ab; was aus der Matura bekannt ist (e, ln,
+// ∞), steht nicht auf der Folie.
+.reveal .lesehilfe {
+  display: block;
+  font-size: 0.55em;
+  line-height: 1.3;
+  color: #5a6470;
+  margin: 0.1em 0 0.3em;
+}
+
+// Folie 11: Materialzeile und QR höher, mit Abstand zur Fusszeile
+.reveal .material { margin-top: -0.4em; }
+.reveal .material p { margin: 0; }
+// feste Höhe und width: auto, sonst staucht max-height den QR (Breite bleibt fix)
+.reveal .material img { height: 140px; width: auto; max-height: none; margin: 0; }
+
+// Folie 3: Beispiel Remission, zwei Fotos
+.reveal .remission > p:first-of-type { font-size: 0.75em; }
+.reveal .remission img.foto {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin: 0.2em 0;
+}
+.reveal .remission .column p { font-size: 0.75em; margin: 0.15em 0; }
+.reveal .remission .merke { margin-top: 0.5em; }
+
+// Folie 5: Vorhersagen der Geraden als Aufzählung unter der Abbildung
+.reveal .vorhersage { font-size: 0.8em; }
+.reveal .vorhersage ul { margin: 0.2em 0 0 1em; }
+.reveal .vorhersage li { margin: 0.05em 0; }
+
+// Folie 5: lm()-Befehl neben der Abbildung
+.reveal .lm-code { font-size: 0.7em; padding-top: 1.2em; }
+.reveal .lm-code pre { width: 100%; margin: 0.3em 0; font-size: 1em; }
+.reveal .lm-code pre code { font-size: 0.82em; line-height: 1.35; max-height: none; }
+.reveal .lm-code .merke { margin-top: 1em; }
+
+// Folie 4: Frage wie in KlickerUZH, kompakter, damit der QR noch Platz hat
+.reveal .intuition .klicker {
+  font-size: 0.68em;
+}
+.reveal .intuition .klicker p {
+  margin: 0.35em 0;
+}
+
+// Backup-Sektion. Divider mit Index (jede Zeile ein Link), pro Folie eine
+// Track-Zeile oben («Backup · Gruppe»,
+// «↩ Index» rechts) und die Lehrbuchquelle fest unten links, über der Fusszeile.
+$bk-blue: #0072B2;
+$bk-ink: #12355b;
+$bk-gray: #5a6470;
+
+.reveal .slide.section-divider h1 {
+  color: #fff;
+  font-size: 1.6em;
+  margin-bottom: 0.2em;
+}
+.reveal .slide.section-divider .backup-index {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.6em 2em;
+  margin-top: 0.8em;
+  text-align: left;
+  font-size: 0.62em;
+  line-height: 1.3;
+
+  .verb {
+    margin: 0 0 0.35em 0;
+    font-size: 0.72em;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.65);
+  }
+  ul { list-style: none; margin: 0; padding: 0; }
+  li { margin: 0 0 0.35em 0; }
+  a {
+    color: #fff;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.35);
+  }
+  code { color: #fff; background: rgba(255, 255, 255, 0.12); }
+}
+
+.reveal .slides section.backup {
+  font-size: 0.9em;
+  h2 { margin-top: 0.55em; font-size: 1.3em; }
+  p { margin: 0.3em 0; }
+  img { margin: 0; max-height: none; }
+  table { font-size: 0.8em; margin: 0.2em auto; }
+  table td, table th { padding: 0.1em 0.6em; }
+  pre { margin: 0.2em 0; width: 100%; }
+  pre code { font-size: 0.8em; max-height: none; }
+  .klicker { font-size: 0.85em; margin-bottom: 0.2em; }
+}
+
+// Track-Zeile: «BACKUP · MODELL · INTERPRETATION · SCHÄTZUNG   ↩ INDEX»
+.reveal .slides section.backup .track {
+  position: absolute;
+  top: 2px;
+  left: 0;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #9aa3ad;
+  line-height: 1;
+
+  span.kicker { color: $bk-gray; margin-right: 1.2em; }
+  span.on { color: $bk-blue; }
+  span.g + span.g::before { content: " · "; color: #9aa3ad; font-weight: 400; }
+  a.back {
+    margin-left: 1.8em;
+    color: $bk-gray;
+    text-decoration: none;
+    letter-spacing: 0.06em;
+  }
+}
+
+// Quellzeile: fest unten links, über der reveal-Fusszeile
+.reveal .slides section.backup .src {
+  position: absolute;
+  left: 0;
+  bottom: 48px;
+  max-width: 92%;
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.35;
+  color: $bk-gray;
+}
+
+// Stichworte neben einer Abbildung
+.reveal .backup .labels {
+  font-size: 0.86em;
+  line-height: 1.3;
+  ul { list-style: none; margin: 0; padding: 0; }
+  li { position: relative; padding-left: 0.9em; margin-bottom: 0.5em; }
+  li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.5em;
+    width: 0.32em;
+    height: 0.32em;
+    border-radius: 50%;
+    background: $bk-blue;
+  }
+  pre { margin: 0.1em 0 0.5em; font-size: 0.62em; }
+  pre code { font-size: 1em; }
+}
+
+// Drei nummerierte Gründe (bk-lm): Nummer im Kreis, Titel, ein Satz
+.reveal .backup .gruende {
+  font-size: 0.8em;
+  line-height: 1.3;
+  > div {
+    display: flex;
+    gap: 0.6em;
+    align-items: flex-start;
+    margin-bottom: 0.7em;
+  }
+  .nr {
+    flex: 0 0 1.5em;
+    width: 1.5em;
+    height: 1.5em;
+    line-height: 1.5em;
+    border-radius: 50%;
+    background: $bk-blue;
+    color: #fff;
+    font-size: 0.85em;
+    font-weight: 700;
+    text-align: center;
+  }
+  b { display: block; color: $bk-ink; }
+  span { color: $bk-gray; font-size: 0.92em; }
+}
+
+// Abbildung mittig (bk-doppelt, bk-or)
+.reveal .backup .fig-mid p { margin: 0; text-align: center; }
+.reveal .backup .fig-mid img { display: block; margin: 0 auto; }
+
+// Drei Spalten unter den drei Panels (bk-or)
+.reveal .backup .skalen {
+  display: flex;
+  gap: 1.2em;
+  margin: 0.4em auto 0;
+  width: 96%;
+  font-size: 0.68em;
+  line-height: 1.3;
+  > div {
+    flex: 1;
+    border-top: 4px solid $bk-blue;
+    padding-top: 0.4em;
+  }
+  > div.hl { border-top-color: #009E73; }
+  b { display: block; color: $bk-ink; margin-bottom: 0.15em; }
+  span { color: $bk-gray; }
+}
+
+// Schritte als Kästen mit Pfeil (bk-ml)
+.reveal .backup .pipeline {
+  display: flex;
+  gap: 1.3em;
+  margin: 0.4em 0 0.2em;
+  font-size: 0.66em;
+  line-height: 1.3;
+  > div {
+    flex: 1;
+    position: relative;
+    border-top: 4px solid $bk-blue;
+    padding-top: 0.45em;
+  }
+  > div + div::before {
+    content: "→";
+    position: absolute;
+    left: -1.05em;
+    top: 0.45em;
+    color: #9aa3ad;
+  }
+  > div.hl { border-top-color: #009E73; }
+  b { display: block; font-size: 1.15em; color: $bk-ink; margin-bottom: 0.2em; }
+  span { color: $bk-gray; }
+}
+
+// Zwei Karten im Vergleich (bk-r2)
+.reveal .backup .cards {
+  display: flex;
+  gap: 1.6em;
+  margin-top: 0.5em;
+  > div {
+    flex: 1;
+    border-top: 4px solid $bk-blue;
+    padding-top: 0.5em;
+    font-size: 0.78em;
+    line-height: 1.3;
+  }
+  > div.lm { border-top-color: #D55E00; }
+  > div.lm .verb { color: #D55E00; }
+  .verb {
+    display: block;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: $bk-blue;
+    margin-bottom: 0.25em;
+  }
+  strong {
+    display: block;
+    font-size: 1.2em;
+    line-height: 1.15;
+    color: $bk-ink;
+    margin-bottom: 0.35em;
+  }
+  p { margin: 0 0 0.3em 0; color: $bk-gray; }
+  .test { color: $bk-ink; font-weight: 600; }
+}
+
+// Kennzahl-Kacheln (bk-r2): Wert gross, Name darunter
+.reveal .backup .stats {
+  display: flex;
+  justify-content: center;
+  gap: 3em;
+  margin: 0.6em 0 0.2em;
+  > div { text-align: center; }
+  b { display: block; font-size: 1.9em; line-height: 1.1; color: $bk-blue; font-weight: 700; }
+  span { display: block; font-size: 0.7em; color: $bk-gray; letter-spacing: 0.04em; }
+}
+
+.reveal .backup .lead { font-size: 0.8em; }
+.reveal .backup .lead.center { text-align: center; margin-top: 0.4em; }
+.reveal .backup .columns.vcenter { align-items: center; }

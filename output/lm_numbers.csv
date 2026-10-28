@@ -1,0 +1,9 @@
+"quantity","value"
+"lm_intercept",-0.0738826519454194
+"lm_slope",0.0297064807512608
+"lm_pred_min_x",-0.0441761711941586
+"lm_pred_max_x",1.11437657810501
+"x_min_obs",1
+"x_max_obs",40
+"n_fitted_outside_01",20
+"n_total",200
